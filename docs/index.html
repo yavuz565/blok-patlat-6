@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Block Blast</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+}
+
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at 20% 10%,#30206d,transparent 35%),
+        radial-gradient(circle at 90% 90%,#5d164f,transparent 35%),
+        linear-gradient(145deg,#08091c,#17103e);
+    color:white;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#game{
+    width:min(94vw,520px);
+    height:min(96vh,850px);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:clamp(25px,7vw,40px);
+    font-weight:1000;
+    letter-spacing:-2px;
+    background:linear-gradient(90deg,#43edff,#fff,#ff4eaa);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.stats{
+    display:flex;
+    gap:6px;
+}
+
+.stat{
+    min-width:70px;
+    padding:7px 9px;
+    text-align:center;
+    border-radius:13px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.stat small{
+    display:block;
+    color:#aaa8c8;
+    font-size:9px;
+    font-weight:bold;
+}
+
+.stat b{
+    font-size:19px;
+}
+
+#boardBox{
+    position:relative;
+    width:100%;
+    aspect-ratio:1;
+    padding:8px;
+    border-radius:23px;
+    background:rgba(0,0,0,.28);
+    box-shadow:
+        0 25px 60px rgba(0,0,0,.5),
+        inset 0 0 0 1px rgba(255,255,255,.1);
+}
+
+#board{
+    width:100%;
+    height:100%;
+    display:grid;
+    grid-template-columns:repeat(8,1fr);
+    grid-template-rows:repeat(8,1fr);
+    gap:5px;
+}
+
+.cell{
+    border-radius:8px;
+    background:rgba(255,255,255,.055);
+    position:relative;
+}
+
+.cell.block{
+    transform:scale(.94);
+    box-shadow:
+        inset 0 2px rgba(255,255,255,.35),
+        inset 0 -5px rgba(0,0,0,.22),
+        0 4px 10px rgba(0,0,0,.3);
+}
+
+.cell.block:after{
+    content:"";
+    position:absolute;
+    left:10%;
+    right:10%;
+    top:7%;
+    height:18%;
+    border-radius:50%;
+    background:rgba(255,255,255,.3);
+}
+
+.cell.previewGood{
+    background:#43f582!important;
+    opacity:.65;
+    box-shadow:0 0 14px #43f582;
+}
+
+.cell.previewBad{
+    background:#ff1744!important;
+    opacity:.7;
+    box-shadow:0 0 14px #ff1744;
+}
+
+#pieces{
+    height:125px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.slot{
+    border-radius:18px;
+    background:rgba(255,255,255,.055);
+    border:1px solid rgba(255,255,255,.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.piece{
+    display:grid;
+    gap:4px;
+    padding:5px;
+    touch-action:none;
+    cursor:grab;
+}
+
+.block{
+    width:23px;
+    height:23px;
+    border-radius:6px;
+    position:relative;
+    box-shadow:
+        inset 0 2px rgba(255,255,255,.35),
+        inset 0 -3px rgba(0,0,0,.22),
+        0 3px 7px rgba(0,0,0,.2);
+}
+
+.block:after{
+    content:"";
+    position:absolute;
+    left:4px;
+    right:4px;
+    top:3px;
+    height:5px;
+    border-radius:50%;
+    background:rgba(255,255,255,.3);
+}
+
+/*
+  ÖNEMLİ:
+  Bu, sürüklenen kopyadır.
+  Orijinal parça aşağıdaki kutuda kalır.
+*/
+.dragClone{
+    position:fixed!important;
+    z-index:99999!important;
+    pointer-events:none!important;
+    transform:translate(-50%,-125%) scale(1.2);
+    filter:drop-shadow(0 12px 18px rgba(0,0,0,.55));
+    margin:0!important;
+}
+
+.controls{
+    display:flex;
+    gap:7px;
+}
+
+button{
+    flex:1;
+    border:0;
+    color:white;
+    font-weight:900;
+    font-size:13px;
+    padding:13px 6px;
+    border-radius:14px;
+    cursor:pointer;
+    background:rgba(255,255,255,.1);
+}
+
+button:active{
+    transform:scale(.95);
+}
+
+#sound{
+    background:linear-gradient(135deg,#009ed0,#4862ff);
+}
+
+#pause{
+    background:linear-gradient(135deg,#6746ff,#aa30ff);
+}
+
+#restart{
+    background:linear-gradient(135deg,#ff347d,#ff7044);
+}
+
+#message{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:38px;
+    font-weight:1000;
+    pointer-events:none;
+    opacity:0;
+    text-shadow:0 5px 20px #000;
+}
+
+#message.show{
+    animation:pop .65s ease-out;
+}
+
+@keyframes pop{
+    0%{opacity:0;transform:scale(.5)}
+    25%{opacity:1;transform:scale(1.1)}
+    100%{opacity:0;transform:scale(1.4)}
+}
+
+#particles{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50000;
+}
+
+.particle{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:3px;
+    animation:particle .7s ease-out forwards;
+}
+
+@keyframes particle{
+    from{
+        opacity:1;
+        transform:translate(0,0) rotate(0);
+    }
+    to{
+        opacity:0;
+        transform:translate(var(--x),var(--y)) rotate(600deg);
+    }
+}
+
+#gameOver{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(4,3,18,.78);
+    backdrop-filter:blur(10px);
+    z-index:100000;
+}
+
+#gameOver.show{
+    display:flex;
+}
+
+.panel{
+    width:min(90vw,390px);
+    padding:30px;
+    text-align:center;
+    border-radius:28px;
+    background:linear-gradient(145deg,#251965,#100c30);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 30px 100px rgba(0,0,0,.6);
+}
+
+.panel h1{
+    margin:0;
+    font-size:38px;
+}
+
+.final{
+    color:#ffe45b;
+    font-size:55px;
+    font-weight:1000;
+    margin:15px;
+}
+
+#again{
+    width:100%;
+    background:linear-gradient(135deg,#ff347d,#ff7044);
+}
+
+@media(max-height:700px){
+    #pieces{
+        height:90px;
+    }
+
+    .slot{
+        min-height:80px;
+    }
+
+    .block{
+        width:18px;
+        height:18px;
+    }
+
+    button{
+        padding:9px 5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<header>
+    <div class="logo">BLOCK BLAST</div>
+
+    <div class="stats">
+        <div class="stat">
+            <small>SKOR</small>
+            <b id="score">0</b>
+        </div>
+
+        <div class="stat">
+            <small>REKOR</small>
+            <b id="best">0</b>
+        </div>
+    </div>
+</header>
+
+<div id="boardBox">
+    <div id="board"></div>
+    <div id="message"></div>
+</div>
+
+<div id="pieces"></div>
+
+<div class="controls">
+    <button id="sound">🔊 SES</button>
+    <button id="pause">⏸ DURAKLAT</button>
+    <button id="restart">🔄 YENİ</button>
+</div>
+
+</div>
+
+<div id="particles"></div>
+
+<div id="gameOver">
+    <div class="panel">
+        <h1>💥 OYUN BİTTİ</h1>
+        <p>Skorun</p>
+        <div class="final" id="finalScore">0</div>
+        <p id="recordText"></p>
+        <button id="again">🔥 TEKRAR OYNA</button>
+    </div>
+</div>
+
+<script>
+/* =========================================================
+   BLOCK BLAST
+   ========================================================= */
+
+const SIZE = 8;
+
+const COLORS = [
+    "#ff4f81",
+    "#ff9d3f",
+    "#ffe15b",
+    "#57e878",
+    "#42e9ff",
+    "#5c83ff",
+    "#b967ff",
+    "#ff61d2"
+];
+
+const SHAPES = [
+    [[1]],
+    [[1,1]],
+    [[1],[1]],
+    [[1,1,1]],
+    [[1],[1],[1]],
+    [[1,1,1,1]],
+    [[1],[1],[1],[1]],
+    [[1,1],[1,1]],
+
+    [[1,1,1],[0,1,0]],
+    [[1,0],[1,1],[1,0]],
+    [[0,1],[1,1],[0,1]],
+
+    [[1,1,0],[0,1,1]],
+    [[0,1,1],[1,1,0]],
+
+    [[1,0,0],[1,1,1]],
+    [[0,0,1],[1,1,1]],
+    [[1,1,1],[1,0,0]],
+    [[1,1,1],[0,0,1]],
+
+    [[1,1,1],[1,1,1]]
+];
+
+let board;
+let pieces;
+let score = 0;
+let best = Number(localStorage.getItem("blockBlastBest") || 0);
+
+let paused = false;
+let ended = false;
+
+let audio = null;
+let soundOn = true;
+
+/*
+  Aktif sürükleme bilgisi.
+*/
+let dragging = null;
+
+
+/* =========================================================
+   SES
+   ========================================================= */
+
+function startAudio(){
+
+    if(!soundOn) return;
+
+    if(!audio){
+        audio = new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+    }
+
+    if(audio.state === "suspended"){
+        audio.resume();
+    }
+}
+
+function beep(
+    frequency,
+    duration = .08,
+    type = "sine",
+    volume = .04
+){
+
+    if(!soundOn) return;
+
+    startAudio();
+
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+
+    gain.gain.setValueAtTime(
+        volume,
+        audio.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audio.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audio.destination);
+
+    oscillator.start();
+
+    oscillator.stop(
+        audio.currentTime + duration
+    );
+}
+
+
+/* =========================================================
+   YENİ OYUN
+   ========================================================= */
+
+function createEmptyBoard(){
+
+    board = [];
+
+    for(let r=0;r<SIZE;r++){
+
+        const row=[];
+
+        for(let c=0;c<SIZE;c++){
+            row.push(null);
+        }
+
+        board.push(row);
+    }
+}
+
+function randomPiece(){
+
+    const source =
+        SHAPES[
+            Math.floor(
+                Math.random()*SHAPES.length
+            )
+        ];
+
+    return {
+        shape: source.map(row => [...row]),
+        color:
+            COLORS[
+                Math.floor(
+                    Math.random()*COLORS.length
+                )
+            ]
+    };
+}
+
+function createPieces(){
+
+    pieces=[
+        randomPiece(),
+        randomPiece(),
+        randomPiece()
+    ];
+}
+
+function newGame(){
+
+    createEmptyBoard();
+    createPieces();
+
+    score=0;
+    paused=false;
+    ended=false;
+
+    document
+        .getElementById("gameOver")
+        .classList.remove("show");
+
+    document
+        .getElementById("pause")
+        .textContent="⏸ DURAKLAT";
+
+    updateScore();
+
+    drawBoard();
+    drawPieces();
+}
+
+newGame();
+
+
+/* =========================================================
+   TAHTAYI ÇİZ
+   ========================================================= */
+
+function drawBoard(preview=null){
+
+    const boardElement =
+        document.getElementById("board");
+
+    boardElement.innerHTML="";
+
+    for(let r=0;r<SIZE;r++){
+
+        for(let c=0;c<SIZE;c++){
+
+            const cell =
+                document.createElement("div");
+
+            cell.className="cell";
+
+            const value=board[r][c];
+
+            if(value){
+
+                cell.classList.add("block");
+
+                cell.style.background =
+                    value.color;
+            }
+
+            if(preview){
+
+                const isPreview =
+                    preview.cells.some(
+                        p =>
+                            p.r===r &&
+                            p.c===c
+                    );
+
+                if(isPreview){
+
+                    cell.classList.add(
+                        preview.valid
+                            ? "previewGood"
+                            : "previewBad"
+                    );
+                }
+            }
+
+            boardElement.appendChild(cell);
+        }
+    }
+}
+
+
+/* =========================================================
+   ALTTAKİ PARÇALAR
+   ========================================================= */
+
+function drawPieces(){
+
+    const container =
+        document.getElementById("pieces");
+
+    container.innerHTML="";
+
+    pieces.forEach((piece,index)=>{
+
+        const slot =
+            document.createElement("div");
+
+        slot.className="slot";
+
+        if(!piece){
+
+            container.appendChild(slot);
+            return;
+        }
+
+        const element =
+            document.createElement("div");
+
+        element.className="piece";
+
+        const rows=piece.shape.length;
+        const cols=piece.shape[0].length;
+
+        element.style.gridTemplateColumns =
+            `repeat(${cols},23px)`;
+
+        element.style.gridTemplateRows =
+            `repeat(${rows},23px)`;
+
+        for(let r=0;r<rows;r++){
+
+            for(let c=0;c<cols;c++){
+
+                if(!piece.shape[r][c]){
+                    continue;
+                }
+
+                const block =
+                    document.createElement("div");
+
+                block.className="block";
+
+                block.style.background =
+                    piece.color;
+
+                block.style.gridRow =
+                    r+1;
+
+                block.style.gridColumn =
+                    c+1;
+
+                element.appendChild(block);
+            }
+        }
+
+        slot.appendChild(element);
+        container.appendChild(slot);
+
+        /*
+          Burada EN ÖNEMLİ şey:
+          Orijinal parçayı taşımıyoruz.
+
+          Sadece clone oluşturuyoruz.
+        */
+
+        element.addEventListener(
+            "pointerdown",
+            event => beginDrag(
+                event,
+                index,
+                piece,
+                element
+            )
+        );
+    });
+}
+
+
+/* =========================================================
+   SÜRÜKLEME BAŞLAT
+   ========================================================= */
+
+function beginDrag(
+    event,
+    index,
+    piece,
+    original
+){
+
+    if(paused || ended) return;
+
+    startAudio();
+
+    /*
+      Eski sürükleme varsa temizle.
+    */
+
+    cancelDrag();
+
+    /*
+      Orijinal parçanın KOPYASINI oluştur.
+    */
+
+    const clone =
+        original.cloneNode(true);
+
+    clone.classList.add("dragClone");
+
+    document.body.appendChild(clone);
+
+    dragging={
+        index:index,
+        piece:piece,
+        original:original,
+        clone:clone
+    };
+
+    updateDrag(
+        event.clientX,
+        event.clientY
+    );
+
+    event.preventDefault();
+}
+
+
+/* =========================================================
+   SÜRÜKLEME
+   ========================================================= */
+
+document.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!dragging) return;
+
+        updateDrag(
+            event.clientX,
+            event.clientY
+        );
+    }
+);
+
+document.addEventListener(
+    "pointerup",
+    event => {
+
+        if(!dragging) return;
+
+        finishDrag(
+            event.clientX,
+            event.clientY
+        );
+    }
+);
+
+document.addEventListener(
+    "pointercancel",
+    () => cancelDrag()
+);
+
+
+/* =========================================================
+   SÜRÜKLENEN PARÇAYI HAREKET ETTİR
+   ========================================================= */
+
+function updateDrag(x,y){
+
+    if(!dragging) return;
+
+    const clone=dragging.clone;
+
+    clone.style.left=x+"px";
+    clone.style.top=y+"px";
+
+    const position =
+        getBoardPosition(x,y);
+
+    if(!position){
+
+        drawBoard();
+        return;
+    }
+
+    const valid =
+        canPlace(
+            dragging.piece.shape,
+            position.r,
+            position.c
+        );
+
+    const cells=[];
+
+    for(
+        let r=0;
+        r<dragging.piece.shape.length;
+        r++
+    ){
+
+        for(
+            let c=0;
+            c<dragging.piece.shape[r].length;
+            c++
+        ){
+
+            if(!dragging.piece.shape[r][c]){
+                continue;
+            }
+
+            cells.push({
+                r:position.r+r,
+                c:position.c+c
+            });
+        }
+    }
+
+    drawBoard({
+        cells:cells,
+        valid:valid
+    });
+}
+
+
+/* =========================================================
+   TAHTADAKİ HÜCREYİ BUL
+   ========================================================= */
+
+function getBoardPosition(x,y){
+
+    const boardElement =
+        document.getElementById("board");
+
+    const rect =
+        boardElement.getBoundingClientRect();
+
+    if(
+        x < rect.left ||
+        x > rect.right ||
+        y < rect.top ||
+        y > rect.bottom
+    ){
+        return null;
+    }
+
+    const cellWidth =
+        rect.width/SIZE;
+
+    const cellHeight =
+        rect.height/SIZE;
+
+    let c=Math.floor(
+        (x-rect.left)/cellWidth
+    );
+
+    let r=Math.floor(
+        (y-rect.top)/cellHeight
+    );
+
+    /*
+      Parçayı imlecin ortasına getiriyoruz.
+    */
+
+    const shape=dragging.piece.shape;
+
+    c -= Math.floor(
+        shape[0].length/2
+    );
+
+    r -= Math.floor(
+        shape.length/2
+    );
+
+    return {r,c};
+}
+
+
+/* =========================================================
+   YERLEŞEBİLİR Mİ?
+   ========================================================= */
+
+function canPlace(shape,startR,startC){
+
+    for(
+        let r=0;
+        r<shape.length;
+        r++
+    ){
+
+        for(
+            let c=0;
+            c<shape[r].length;
+            c++
+        ){
+
+            if(!shape[r][c]){
+                continue;
+            }
+
+            const boardR=startR+r;
+            const boardC=startC+c;
+
+            if(
+                boardR<0 ||
+                boardR>=SIZE ||
+                boardC<0 ||
+                boardC>=SIZE
+            ){
+                return false;
+            }
+
+            if(board[boardR][boardC]){
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/* =========================================================
+   SÜRÜKLEMEYİ BİTİR
+   ========================================================= */
+
+function finishDrag(x,y){
+
+    if(!dragging) return;
+
+    const position =
+        getBoardPosition(x,y);
+
+    if(
+        position &&
+        canPlace(
+            dragging.piece.shape,
+            position.r,
+            position.c
+        )
+    ){
+
+        /*
+          GERÇEKTEN YERLEŞTİR
+        */
+
+        putPiece(
+            dragging.index,
+            dragging.piece,
+            position.r,
+            position.c
+        );
+
+    }else{
+
+        /*
+          Geçersiz yere bırakıldı.
+          Tahta eski haline döner.
+        */
+
+        drawBoard();
+    }
+
+    /*
+      KOPYA HER DURUMDA SİLİNİR.
+      Böylece küçük/hayalet parça kalmaz.
+    */
+
+    if(dragging.clone){
+        dragging.clone.remove();
+    }
+
+    dragging=null;
+
+    /*
+      Parça alanını yeniden çiz.
+      Yerleştirilen parça burada kaybolur.
+    */
+
+    drawPieces();
+}
+
+
+/* =========================================================
+   SÜRÜKLEMEYİ İPTAL
+   ========================================================= */
+
+function cancelDrag(){
+
+    if(!dragging) return;
+
+    if(dragging.clone){
+        dragging.clone.remove();
+    }
+
+    dragging=null;
+
+    drawBoard();
+}
+
+
+/* =========================================================
+   PARÇAYI TAHTAYA KOY
+   ========================================================= */
+
+function putPiece(
+    index,
+    piece,
+    startR,
+    startC
+){
+
+    let blocks=0;
+
+    for(
+        let r=0;
+        r<piece.shape.length;
+        r++
+    ){
+
+        for(
+            let c=0;
+            c<piece.shape[r].length;
+            c++
+        ){
+
+            if(!piece.shape[r][c]){
+                continue;
+            }
+
+            board[startR+r][startC+c]={
+                color:piece.color
+            };
+
+            blocks++;
+        }
+    }
+
+    /*
+      Aşağıdaki parçayı tüket.
+    */
+
+    pieces[index]=null;
+
+    /*
+      Puan.
+    */
+
+    score+=blocks;
+
+    beep(
+        250,
+        .05,
+        "square",
+        .025
+    );
+
+    setTimeout(
+        () => beep(
+            380,
+            .06,
+            "square",
+            .02
+        ),
+        40
+    );
+
+    drawBoard();
+
+    updateScore();
+
+    /*
+      Satır/sütun temizle.
+    */
+
+    setTimeout(
+        clearLines,
+        80
+    );
+
+    /*
+      Üç parça da kullanıldıysa
+      yeni üç parça üret.
+    */
+
+    if(pieces.every(p => p===null)){
+
+        setTimeout(
+            () => {
+                createPieces();
+                drawPieces();
+            },
+            180
+        );
+    }
+
+    setTimeout(
+        checkGameOver,
+        300
+    );
+}
+
+
+/* =========================================================
+   SATIR / SÜTUN TEMİZLE
+   ========================================================= */
+
+function clearLines(){
+
+    const rows=[];
+    const cols=[];
+
+    for(let r=0;r<SIZE;r++){
+
+        if(
+            board[r].every(
+                cell => cell!==null
+            )
+        ){
+            rows.push(r);
+        }
+    }
+
+    for(let c=0;c<SIZE;c++){
+
+        let full=true;
+
+        for(let r=0;r<SIZE;r++){
+
+            if(!board[r][c]){
+                full=false;
+                break;
+            }
+        }
+
+        if(full){
+            cols.push(c);
+        }
+    }
+
+    const total=
+        rows.length+
+        cols.length;
+
+    if(total===0){
+        return;
+    }
+
+    const remove=new Set();
+
+    rows.forEach(r => {
+
+        for(let c=0;c<SIZE;c++){
+
+            remove.add(
+                r+","+c
+            );
+        }
+    });
+
+    cols.forEach(c => {
+
+        for(let r=0;r<SIZE;r++){
+
+            remove.add(
+                r+","+c
+            );
+        }
+    });
+
+    remove.forEach(key => {
+
+        const parts=
+            key.split(",");
+
+        const r=Number(parts[0]);
+        const c=Number(parts[1]);
+
+        createParticles(
+            r,
+            c,
+            board[r][c]?.color || "#fff"
+        );
+
+        board[r][c]=null;
+    });
+
+    score += total*100;
+
+    if(total>=2){
+        score += total*50;
+
+        showMessage(
+            total>=3
+                ? "🔥 MEGA!"
+                : "✨ COMBO!"
+        );
+
+    }else{
+
+        showMessage("💥 TEMİZ!");
+    }
+
+    /*
+      Temizleme sesi.
+    */
+
+    [440,550,660,880].forEach(
+        (frequency,i) => {
+
+            if(i>=total+1) return;
+
+            setTimeout(
+                () => beep(
+                    frequency,
+                    .12,
+                    "sine",
+                    .045
+                ),
+                i*55
+            );
+        }
+    );
+
+    drawBoard();
+    updateScore();
+}
+
+
+/* =========================================================
+   PARÇACIKLAR
+   ========================================================= */
+
+function createParticles(r,c,color){
+
+    const boardElement =
+        document.getElementById("board");
+
+    const rect =
+        boardElement.getBoundingClientRect();
+
+    const w=rect.width/SIZE;
+    const h=rect.height/SIZE;
+
+    const x=
+        rect.left+
+        c*w+
+        w/2;
+
+    const y=
+        rect.top+
+        r*h+
+        h/2;
+
+    for(let i=0;i<5;i++){
+
+        const particle=
+            document.createElement("div");
+
+        particle.className="particle";
+
+        particle.style.background=color;
+
+        particle.style.left=x+"px";
+        particle.style.top=y+"px";
+
+        particle.style.setProperty(
+            "--x",
+            ((Math.random()-.5)*150)+"px"
+        );
+
+        particle.style.setProperty(
+            "--y",
+            ((Math.random()-.5)*150)+"px"
+        );
+
+        document
+            .getElementById("particles")
+            .appendChild(particle);
+
+        setTimeout(
+            () => particle.remove(),
+            800
+        );
+    }
+}
+
+
+/* =========================================================
+   MESAJ
+   ========================================================= */
+
+function showMessage(text){
+
+    const element=
+        document.getElementById("message");
+
+    element.textContent=text;
+
+    element.classList.remove("show");
+
+    void element.offsetWidth;
+
+    element.classList.add("show");
+}
+
+
+/* =========================================================
+   GAME OVER
+   ========================================================= */
+
+function checkGameOver(){
+
+    if(paused || ended){
+        return;
+    }
+
+    const available=
+        pieces.filter(Boolean);
+
+    if(available.length===0){
+        return;
+    }
+
+    for(const piece of available){
+
+        for(let r=0;r<SIZE;r++){
+
+            for(let c=0;c<SIZE;c++){
+
+                if(
+                    canPlace(
+                        piece.shape,
+                        r,
+                        c
+                    )
+                ){
+                    return;
+                }
+            }
+        }
+    }
+
+    endGame();
+}
+
+function endGame(){
+
+    ended=true;
+
+    beep(
+        300,
+        .15,
+        "sawtooth",
+        .03
+    );
+
+    setTimeout(
+        () => beep(
+            220,
+            .25,
+            "sawtooth",
+            .03
+        ),
+        150
+    );
+
+    let newRecord=false;
+
+    if(score>best){
+
+        best=score;
+
+        localStorage.setItem(
+            "blockBlastBest",
+            best
+        );
+
+        newRecord=true;
+    }
+
+    document.getElementById(
+        "finalScore"
+    ).textContent=
+        score.toLocaleString("tr-TR");
+
+    document.getElementById(
+        "recordText"
+    ).textContent=
+        newRecord
+            ? "🏆 YENİ REKOR!"
+            : "Rekor: "+best;
+
+    document
+        .getElementById("gameOver")
+        .classList.add("show");
+
+    updateScore();
+}
+
+
+/* =========================================================
+   SKOR
+   ========================================================= */
+
+function updateScore(){
+
+    document.getElementById(
+        "score"
+    ).textContent=
+        score.toLocaleString("tr-TR");
+
+    document.getElementById(
+        "best"
+    ).textContent=
+        best.toLocaleString("tr-TR");
+}
+
+
+/* =========================================================
+   BUTONLAR
+   ========================================================= */
+
+document.getElementById("sound").onclick=()=>{
+
+    soundOn=!soundOn;
+
+    document.getElementById("sound").textContent=
+        soundOn
+            ? "🔊 SES"
+            : "🔇 SES KAPALI";
+
+    if(soundOn){
+
+        startAudio();
+
+        beep(
+            600,
+            .08
+        );
+    }
+};
+
+
+document.getElementById("pause").onclick=()=>{
+
+    if(ended){
+        return;
+    }
+
+    paused=!paused;
+
+    document.getElementById("pause").textContent=
+        paused
+            ? "▶ DEVAM"
+            : "⏸ DURAKLAT";
+
+    showMessage(
+        paused
+            ? "⏸ DURAKLADI"
+            : "▶ DEVAM!"
+    );
+};
+
+
+document.getElementById("restart").onclick=()=>{
+
+    startAudio();
+
+    newGame();
+};
+
+
+document.getElementById("again").onclick=()=>{
+
+    startAudio();
+
+    newGame();
+};
+
+
+/* =========================================================
+   KLAVYE
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.code==="Space"){
+
+            event.preventDefault();
+
+            document
+                .getElementById("pause")
+                .click();
+        }
+
+        if(
+            event.key.toLowerCase()==="r"
+        ){
+            newGame();
+        }
+
+        if(
+            event.key.toLowerCase()==="m"
+        ){
+            document
+                .getElementById("sound")
+                .click();
+        }
+    }
+);
+
+
+/* =========================================================
+   MOBİL
+   ========================================================= */
+
+document.addEventListener(
+    "touchmove",
+    event => {
+
+        if(dragging){
+            event.preventDefault();
+        }
+    },
+    {passive:false}
+);
+
+</script>
+
+</body>
+</html>
