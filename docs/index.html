@@ -2,626 +2,2248 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
 <title>Block Blast</title>
 
 <style>
+
+/* =====================================================
+   TEMEL
+===================================================== */
+
 *{
     box-sizing:border-box;
+    margin:0;
+    padding:0;
+
     -webkit-tap-highlight-color:transparent;
     user-select:none;
 }
 
-html,body{
-    margin:0;
+html,
+body{
     width:100%;
     height:100%;
     overflow:hidden;
-    font-family:Arial,Helvetica,sans-serif;
-    background:
-        radial-gradient(circle at 20% 10%,#30206d,transparent 35%),
-        radial-gradient(circle at 90% 90%,#5d164f,transparent 35%),
-        linear-gradient(145deg,#08091c,#17103e);
-    color:white;
 }
 
 body{
+
+    --bg1:#08091b;
+    --bg2:#181042;
+    --glow1:#37268c;
+    --glow2:#79134f;
+
+    --panel:rgba(255,255,255,.055);
+    --panelBorder:rgba(255,255,255,.08);
+
     display:flex;
     justify-content:center;
     align-items:center;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    color:white;
+
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            var(--glow1) 0%,
+            transparent 32%
+        ),
+
+        radial-gradient(
+            circle at 90% 90%,
+            var(--glow2) 0%,
+            transparent 34%
+        ),
+
+        linear-gradient(
+            145deg,
+            var(--bg1),
+            var(--bg2)
+        );
+
+    transition:
+        background .45s ease;
 }
+
+
+/* =====================================================
+   TEMALAR
+===================================================== */
+
+/* NEON */
+
+body[data-theme="neon"]{
+
+    --bg1:#08091b;
+    --bg2:#181042;
+
+    --glow1:#37268c;
+    --glow2:#79134f;
+}
+
+
+/* UZAY */
+
+body[data-theme="space"]{
+
+    --bg1:#020611;
+    --bg2:#0b1d45;
+
+    --glow1:#063d9d;
+    --glow2:#46158a;
+}
+
+
+/* ATEŞ */
+
+body[data-theme="fire"]{
+
+    --bg1:#160504;
+    --bg2:#3a1008;
+
+    --glow1:#a51c00;
+    --glow2:#ff4b00;
+}
+
+
+/* BUZ */
+
+body[data-theme="ice"]{
+
+    --bg1:#03101a;
+    --bg2:#08334d;
+
+    --glow1:#087da5;
+    --glow2:#2048a0;
+}
+
+
+/* CYBERPUNK */
+
+body[data-theme="cyberpunk"]{
+
+    --bg1:#090009;
+    --bg2:#210027;
+
+    --glow1:#ff008c;
+    --glow2:#00d9ff;
+}
+
+
+/* =====================================================
+   ANA OYUN
+===================================================== */
 
 #game{
+
     width:min(94vw,520px);
-    height:min(96vh,850px);
+
+    height:min(97vh,850px);
+
     display:flex;
     flex-direction:column;
-    gap:10px;
+
+    gap:8px;
 }
 
-header{
+
+/* =====================================================
+   ÜST
+===================================================== */
+
+.top{
+
     display:flex;
+
     justify-content:space-between;
     align-items:center;
 }
 
 .logo{
-    font-size:clamp(25px,7vw,40px);
+
+    font-size:
+        clamp(
+            24px,
+            7vw,
+            39px
+        );
+
     font-weight:1000;
+
     letter-spacing:-2px;
-    background:linear-gradient(90deg,#43edff,#fff,#ff4eaa);
+
+    background:
+        linear-gradient(
+            90deg,
+            #42efff,
+            #ffffff,
+            #ff4fa8
+        );
+
     -webkit-background-clip:text;
+    background-clip:text;
+
     color:transparent;
 }
 
-.stats{
+.scores{
+
     display:flex;
-    gap:6px;
-}
 
-.stat{
-    min-width:70px;
-    padding:7px 9px;
-    text-align:center;
-    border-radius:13px;
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.1);
-}
-
-.stat small{
-    display:block;
-    color:#aaa8c8;
-    font-size:9px;
-    font-weight:bold;
-}
-
-.stat b{
-    font-size:19px;
-}
-
-#boardBox{
-    position:relative;
-    width:100%;
-    aspect-ratio:1;
-    padding:8px;
-    border-radius:23px;
-    background:rgba(0,0,0,.28);
-    box-shadow:
-        0 25px 60px rgba(0,0,0,.5),
-        inset 0 0 0 1px rgba(255,255,255,.1);
-}
-
-#board{
-    width:100%;
-    height:100%;
-    display:grid;
-    grid-template-columns:repeat(8,1fr);
-    grid-template-rows:repeat(8,1fr);
     gap:5px;
 }
 
-.cell{
-    border-radius:8px;
-    background:rgba(255,255,255,.055);
+.scoreBox{
+
+    min-width:58px;
+
+    padding:
+        5px 7px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    background:
+        rgba(255,255,255,.08);
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
+
+.scoreBox span{
+
+    display:block;
+
+    color:#aaa8c7;
+
+    font-size:8px;
+
+    font-weight:bold;
+}
+
+.scoreBox b{
+
+    display:block;
+
+    font-size:16px;
+}
+
+#comboBox{
+
+    display:none;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,190,0,.22),
+            rgba(255,50,100,.18)
+        );
+}
+
+#comboBox.active{
+
+    display:block;
+
+    animation:
+        comboPop
+        .3s
+        ease-out;
+}
+
+@keyframes comboPop{
+
+    0%{
+        transform:scale(.7);
+    }
+
+    70%{
+        transform:scale(1.15);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+
+/* =====================================================
+   TAHTA
+===================================================== */
+
+#boardContainer{
+
     position:relative;
-}
 
-.cell.block{
-    transform:scale(.94);
+    width:100%;
+
+    aspect-ratio:1;
+
+    padding:8px;
+
+    border-radius:23px;
+
+    background:
+        rgba(0,0,0,.3);
+
     box-shadow:
-        inset 0 2px rgba(255,255,255,.35),
-        inset 0 -5px rgba(0,0,0,.22),
-        0 4px 10px rgba(0,0,0,.3);
+        0 25px 70px
+        rgba(0,0,0,.5),
+
+        inset 0 0 0 1px
+        rgba(255,255,255,.1);
 }
 
-.cell.block:after{
-    content:"";
+#board{
+
+    width:100%;
+    height:100%;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(8,1fr);
+
+    grid-template-rows:
+        repeat(8,1fr);
+
+    gap:5px;
+}
+
+.boardCell{
+
+    position:relative;
+
+    width:100%;
+    height:100%;
+
+    border-radius:8px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    overflow:hidden;
+}
+
+.boardBlock{
+
     position:absolute;
+
+    left:2%;
+    top:2%;
+
+    width:96%;
+    height:96%;
+
+    border-radius:8px;
+
+    box-shadow:
+
+        inset 0 2px
+        rgba(255,255,255,.35),
+
+        inset 0 -5px
+        rgba(0,0,0,.22),
+
+        0 4px 10px
+        rgba(0,0,0,.28);
+}
+
+.boardBlock::after{
+
+    content:"";
+
+    position:absolute;
+
     left:10%;
     right:10%;
     top:7%;
+
     height:18%;
+
     border-radius:50%;
-    background:rgba(255,255,255,.3);
+
+    background:
+        rgba(255,255,255,.3);
 }
 
-.cell.previewGood{
-    background:#43f582!important;
-    opacity:.65;
-    box-shadow:0 0 14px #43f582;
+
+/* =====================================================
+   ÖNİZLEME
+===================================================== */
+
+.boardCell.previewGood{
+
+    background:#36f276;
+
+    box-shadow:
+        0 0 12px #36f276;
 }
 
-.cell.previewBad{
-    background:#ff1744!important;
-    opacity:.7;
-    box-shadow:0 0 14px #ff1744;
+.boardCell.previewBad{
+
+    background:#ff1645;
+
+    box-shadow:
+        0 0 12px #ff1645;
 }
+
+.boardCell.previewGood .boardBlock,
+.boardCell.previewBad .boardBlock{
+
+    opacity:.35;
+}
+
+
+/* =====================================================
+   ALT PARÇALAR
+===================================================== */
 
 #pieces{
-    height:125px;
+
+    width:100%;
+
+    height:112px;
+
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+
+    grid-template-columns:
+        repeat(3,1fr);
+
     gap:8px;
 }
 
-.slot{
-    border-radius:18px;
-    background:rgba(255,255,255,.055);
-    border:1px solid rgba(255,255,255,.08);
+.pieceSlot{
+
     display:flex;
+
     align-items:center;
     justify-content:center;
+
+    min-width:0;
+    min-height:0;
+
+    border-radius:18px;
+
+    background:
+        var(--panel);
+
+    border:
+        1px solid
+        var(--panelBorder);
 }
 
 .piece{
+
     display:grid;
+
     gap:4px;
-    padding:5px;
+
+    padding:4px;
+
     touch-action:none;
+
     cursor:grab;
+
+    transition:
+        transform .12s ease;
 }
 
-.block{
+.piece:active{
+
+    transform:scale(.94);
+}
+
+.miniBlock{
+
     width:23px;
     height:23px;
+
     border-radius:6px;
+
     position:relative;
+
     box-shadow:
-        inset 0 2px rgba(255,255,255,.35),
-        inset 0 -3px rgba(0,0,0,.22),
-        0 3px 7px rgba(0,0,0,.2);
+
+        inset 0 2px
+        rgba(255,255,255,.35),
+
+        inset 0 -3px
+        rgba(0,0,0,.22),
+
+        0 3px 8px
+        rgba(0,0,0,.22);
 }
 
-.block:after{
+.miniBlock::after{
+
     content:"";
+
     position:absolute;
+
     left:4px;
     right:4px;
     top:3px;
+
     height:5px;
+
     border-radius:50%;
-    background:rgba(255,255,255,.3);
+
+    background:
+        rgba(255,255,255,.3);
 }
 
-/*
-  ÖNEMLİ:
-  Bu, sürüklenen kopyadır.
-  Orijinal parça aşağıdaki kutuda kalır.
-*/
-.dragClone{
-    position:fixed!important;
-    z-index:99999!important;
-    pointer-events:none!important;
-    transform:translate(-50%,-125%) scale(1.2);
-    filter:drop-shadow(0 12px 18px rgba(0,0,0,.55));
-    margin:0!important;
+
+/* =====================================================
+   SÜRÜKLENEN PARÇA
+===================================================== */
+
+.dragPiece{
+
+    position:fixed !important;
+
+    z-index:999999 !important;
+
+    pointer-events:none !important;
+
+    transform:
+        translate(-50%,-125%)
+        scale(1.18);
+
+    filter:
+        drop-shadow(
+            0 12px 18px
+            rgba(0,0,0,.55)
+        );
 }
 
-.controls{
+
+/* =====================================================
+   DÖNDÜRME BUTONLARI
+===================================================== */
+
+.rotateButtons{
+
     display:flex;
+
+    gap:7px;
+}
+
+.rotateButtons button{
+
+    padding:
+        9px 5px;
+}
+
+#rotateLeftBtn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #009ed0,
+            #4862ff
+        );
+}
+
+#rotateRightBtn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #6946ff,
+            #d13aff
+        );
+}
+
+
+/* =====================================================
+   BUTONLAR
+===================================================== */
+
+.buttons{
+
+    display:flex;
+
     gap:7px;
 }
 
 button{
+
     flex:1;
-    border:0;
-    color:white;
-    font-weight:900;
-    font-size:13px;
-    padding:13px 6px;
+
+    border:none;
+
+    padding:
+        10px 5px;
+
     border-radius:14px;
+
+    color:white;
+
+    font-size:11px;
+
+    font-weight:900;
+
     cursor:pointer;
-    background:rgba(255,255,255,.1);
+
+    background:
+        rgba(255,255,255,.1);
 }
 
 button:active{
+
     transform:scale(.95);
 }
 
-#sound{
-    background:linear-gradient(135deg,#009ed0,#4862ff);
+#soundBtn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #009ed0,
+            #4862ff
+        );
 }
 
-#pause{
-    background:linear-gradient(135deg,#6746ff,#aa30ff);
+#vibrationBtn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #00a878,
+            #16c7a0
+        );
 }
 
-#restart{
-    background:linear-gradient(135deg,#ff347d,#ff7044);
+#pauseBtn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #6946ff,
+            #a82dff
+        );
 }
+
+#restartBtn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff347d,
+            #ff7044
+        );
+}
+
+
+/* =====================================================
+   TEMA
+===================================================== */
+
+.themeRow{
+
+    display:flex;
+
+    gap:7px;
+
+    align-items:center;
+}
+
+.themeLabel{
+
+    color:#aaa8c7;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    white-space:nowrap;
+}
+
+#themeSelect{
+
+    flex:1;
+
+    border:none;
+
+    outline:none;
+
+    color:white;
+
+    background:
+        rgba(255,255,255,.1);
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    border-radius:12px;
+
+    padding:
+        9px 10px;
+
+    font-size:11px;
+
+    font-weight:900;
+}
+
+#themeSelect option{
+
+    color:white;
+
+    background:#17132f;
+}
+
+
+/* =====================================================
+   MESAJ
+===================================================== */
 
 #message{
+
     position:absolute;
+
     inset:0;
+
     display:flex;
-    justify-content:center;
+
     align-items:center;
-    font-size:38px;
-    font-weight:1000;
+    justify-content:center;
+
     pointer-events:none;
+
     opacity:0;
-    text-shadow:0 5px 20px #000;
+
+    font-size:38px;
+
+    font-weight:1000;
+
+    text-shadow:
+        0 5px 20px black;
 }
 
 #message.show{
-    animation:pop .65s ease-out;
+
+    animation:
+        messageAnimation
+        .7s
+        ease-out;
 }
 
-@keyframes pop{
-    0%{opacity:0;transform:scale(.5)}
-    25%{opacity:1;transform:scale(1.1)}
-    100%{opacity:0;transform:scale(1.4)}
+@keyframes messageAnimation{
+
+    0%{
+        opacity:0;
+        transform:scale(.5);
+    }
+
+    25%{
+        opacity:1;
+        transform:scale(1.12);
+    }
+
+    100%{
+        opacity:0;
+        transform:scale(1.4);
+    }
 }
+
+
+/* =====================================================
+   COMBO MESAJ
+===================================================== */
+
+#comboMessage{
+
+    position:fixed;
+
+    left:50%;
+    top:34%;
+
+    z-index:60000;
+
+    pointer-events:none;
+
+    opacity:0;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.5);
+
+    font-size:
+        clamp(30px,9vw,58px);
+
+    font-weight:1000;
+
+    color:#ffe45b;
+
+    text-shadow:
+
+        0 0 8px #ff9d00,
+
+        0 0 25px #ff4f00,
+
+        0 8px 25px
+        rgba(0,0,0,.8);
+}
+
+#comboMessage.show{
+
+    animation:
+        comboMessageAnimation
+        .8s
+        ease-out;
+}
+
+@keyframes comboMessageAnimation{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translate(-50%,-50%)
+            scale(.5)
+            rotate(-8deg);
+    }
+
+    20%{
+        opacity:1;
+
+        transform:
+            translate(-50%,-50%)
+            scale(1.15)
+            rotate(3deg);
+    }
+
+    100%{
+        opacity:0;
+
+        transform:
+            translate(-50%,-70%)
+            scale(1.5)
+            rotate(0);
+    }
+}
+
+
+/* =====================================================
+   PARÇACIK
+===================================================== */
 
 #particles{
+
     position:fixed;
+
     inset:0;
+
     pointer-events:none;
+
     z-index:50000;
 }
 
 .particle{
+
     position:absolute;
+
     width:8px;
     height:8px;
+
     border-radius:3px;
-    animation:particle .7s ease-out forwards;
+
+    animation:
+        explode
+        .75s
+        ease-out
+        forwards;
 }
 
-@keyframes particle{
+@keyframes explode{
+
     from{
+
         opacity:1;
-        transform:translate(0,0) rotate(0);
+
+        transform:
+            translate(0,0)
+            rotate(0);
     }
+
     to{
+
         opacity:0;
-        transform:translate(var(--x),var(--y)) rotate(600deg);
+
+        transform:
+            translate(var(--x),var(--y))
+            rotate(720deg);
     }
 }
+
+
+/* =====================================================
+   OYUN BİTTİ
+===================================================== */
 
 #gameOver{
+
     position:fixed;
+
     inset:0;
+
     display:none;
+
     align-items:center;
     justify-content:center;
-    background:rgba(4,3,18,.78);
-    backdrop-filter:blur(10px);
+
     z-index:100000;
+
+    background:
+        rgba(3,2,18,.82);
+
+    backdrop-filter:
+        blur(10px);
 }
 
 #gameOver.show{
+
     display:flex;
 }
 
-.panel{
+.gameOverBox{
+
     width:min(90vw,390px);
-    padding:30px;
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    padding:27px;
+
     text-align:center;
+
     border-radius:28px;
-    background:linear-gradient(145deg,#251965,#100c30);
-    border:1px solid rgba(255,255,255,.12);
-    box-shadow:0 30px 100px rgba(0,0,0,.6);
+
+    background:
+        linear-gradient(
+            145deg,
+            #251965,
+            #100c30
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.6);
 }
 
-.panel h1{
-    margin:0;
-    font-size:38px;
+.gameOverBox h1{
+
+    font-size:34px;
 }
 
-.final{
+.finalScore{
+
+    margin:12px;
+
     color:#ffe45b;
-    font-size:55px;
+
+    font-size:52px;
+
     font-weight:1000;
-    margin:15px;
 }
 
-#again{
-    width:100%;
-    background:linear-gradient(135deg,#ff347d,#ff7044);
+
+/* =====================================================
+   SKOR GEÇMİŞİ
+===================================================== */
+
+.historyTitle{
+
+    margin-top:12px;
+    margin-bottom:8px;
+
+    color:#aaa8c7;
+
+    font-size:11px;
+
+    font-weight:900;
+
+    text-transform:uppercase;
 }
+
+#scoreHistory{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+
+    margin-bottom:15px;
+}
+
+.historyItem{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:
+        7px 10px;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,255,255,.07);
+
+    font-size:12px;
+
+    font-weight:900;
+}
+
+.historyRank{
+
+    color:#aaa8c7;
+}
+
+.historyScore{
+
+    color:#ffe45b;
+}
+
+#againBtn{
+
+    width:100%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff347d,
+            #ff7044
+        );
+}
+
+
+/* =====================================================
+   MOBİL
+===================================================== */
 
 @media(max-height:700px){
+
+    #game{
+
+        gap:5px;
+    }
+
     #pieces{
+
         height:90px;
     }
 
-    .slot{
-        min-height:80px;
-    }
+    .miniBlock{
 
-    .block{
         width:18px;
         height:18px;
     }
 
     button{
-        padding:9px 5px;
+
+        padding:
+            8px 4px;
+
+        font-size:10px;
+    }
+
+    #comboMessage{
+
+        top:38%;
     }
 }
+
 </style>
 </head>
 
-<body>
+
+<body data-theme="neon">
+
 
 <div id="game">
 
-<header>
-    <div class="logo">BLOCK BLAST</div>
 
-    <div class="stats">
-        <div class="stat">
-            <small>SKOR</small>
-            <b id="score">0</b>
+    <!-- =================================================
+         ÜST
+    ================================================= -->
+
+    <div class="top">
+
+        <div class="logo">
+            BLOCK BLAST
         </div>
 
-        <div class="stat">
-            <small>REKOR</small>
-            <b id="best">0</b>
+
+        <div class="scores">
+
+
+            <div class="scoreBox">
+
+                <span>SKOR</span>
+
+                <b id="score">
+                    0
+                </b>
+
+            </div>
+
+
+            <div
+                class="scoreBox"
+                id="comboBox">
+
+                <span>KOMBO</span>
+
+                <b id="combo">
+                    x1
+                </b>
+
+            </div>
+
+
+            <div class="scoreBox">
+
+                <span>REKOR</span>
+
+                <b id="best">
+                    0
+                </b>
+
+            </div>
+
+
         </div>
+
     </div>
-</header>
 
-<div id="boardBox">
-    <div id="board"></div>
-    <div id="message"></div>
+
+    <!-- =================================================
+         TAHTA
+    ================================================= -->
+
+    <div id="boardContainer">
+
+        <div id="board"></div>
+
+        <div id="message"></div>
+
+    </div>
+
+
+    <!-- =================================================
+         PARÇALAR
+    ================================================= -->
+
+    <div id="pieces"></div>
+
+
+    <!-- =================================================
+         DÖNDÜR
+    ================================================= -->
+
+    <div class="rotateButtons">
+
+        <button id="rotateLeftBtn">
+            ↶ SOLA DÖNDÜR
+        </button>
+
+        <button id="rotateRightBtn">
+            ↷ SAĞA DÖNDÜR
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         TEMA
+    ================================================= -->
+
+    <div class="themeRow">
+
+        <span class="themeLabel">
+            🌌 TEMA
+        </span>
+
+        <select id="themeSelect">
+
+            <option value="neon">
+                🌈 Neon
+            </option>
+
+            <option value="space">
+                🚀 Uzay
+            </option>
+
+            <option value="fire">
+                🔥 Ateş
+            </option>
+
+            <option value="ice">
+                ❄️ Buz
+            </option>
+
+            <option value="cyberpunk">
+                💜 Cyberpunk
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- =================================================
+         BUTONLAR
+    ================================================= -->
+
+    <div class="buttons">
+
+        <button id="soundBtn">
+            🔊 SES
+        </button>
+
+        <button id="vibrationBtn">
+            📳 TİTREŞİM
+        </button>
+
+        <button id="pauseBtn">
+            ⏸ DURAKLAT
+        </button>
+
+        <button id="restartBtn">
+            🔄 YENİ
+        </button>
+
+    </div>
+
 </div>
 
-<div id="pieces"></div>
 
-<div class="controls">
-    <button id="sound">🔊 SES</button>
-    <button id="pause">⏸ DURAKLAT</button>
-    <button id="restart">🔄 YENİ</button>
-</div>
-
-</div>
+<!-- =====================================================
+     PARÇACIKLAR
+===================================================== -->
 
 <div id="particles"></div>
 
+
+<!-- =====================================================
+     COMBO MESAJ
+===================================================== -->
+
+<div id="comboMessage"></div>
+
+
+<!-- =====================================================
+     GAME OVER
+===================================================== -->
+
 <div id="gameOver">
-    <div class="panel">
-        <h1>💥 OYUN BİTTİ</h1>
-        <p>Skorun</p>
-        <div class="final" id="finalScore">0</div>
+
+    <div class="gameOverBox">
+
+        <h1>
+            💥 OYUN BİTTİ
+        </h1>
+
+        <p>
+            Skorun
+        </p>
+
+        <div
+            class="finalScore"
+            id="finalScore">
+
+            0
+
+        </div>
+
+
         <p id="recordText"></p>
-        <button id="again">🔥 TEKRAR OYNA</button>
+
+
+        <div class="historyTitle">
+            📊 SON 5 SKOR
+        </div>
+
+
+        <div id="scoreHistory"></div>
+
+
+        <button id="againBtn">
+            🔥 TEKRAR OYNA
+        </button>
+
     </div>
+
 </div>
 
+
 <script>
-/* =========================================================
-   BLOCK BLAST
-   ========================================================= */
+
+/* =====================================================
+   AYARLAR
+===================================================== */
 
 const SIZE = 8;
 
+
 const COLORS = [
+
     "#ff4f81",
+
     "#ff9d3f",
+
     "#ffe15b",
+
     "#57e878",
+
     "#42e9ff",
+
     "#5c83ff",
+
     "#b967ff",
+
     "#ff61d2"
+
 ];
 
+
 const SHAPES = [
+
     [[1]],
+
     [[1,1]],
+
     [[1],[1]],
+
     [[1,1,1]],
+
     [[1],[1],[1]],
+
     [[1,1,1,1]],
+
     [[1],[1],[1],[1]],
+
     [[1,1],[1,1]],
 
     [[1,1,1],[0,1,0]],
+
     [[1,0],[1,1],[1,0]],
+
     [[0,1],[1,1],[0,1]],
 
     [[1,1,0],[0,1,1]],
+
     [[0,1,1],[1,1,0]],
 
     [[1,0,0],[1,1,1]],
+
     [[0,0,1],[1,1,1]],
+
     [[1,1,1],[1,0,0]],
+
     [[1,1,1],[0,0,1]],
 
     [[1,1,1],[1,1,1]]
+
 ];
 
-let board;
-let pieces;
+
+/* =====================================================
+   DEĞİŞKENLER
+===================================================== */
+
+let board = [];
+
+let pieces = [];
+
 let score = 0;
-let best = Number(localStorage.getItem("blockBlastBest") || 0);
 
-let paused = false;
-let ended = false;
+let best =
+    Number(
+        localStorage.getItem(
+            "blockBlastBest"
+        ) || 0
+    );
 
-let audio = null;
-let soundOn = true;
 
 /*
-  Aktif sürükleme bilgisi.
+   Son 5 skor
 */
-let dragging = null;
+
+let scoreHistory =
+    loadScoreHistory();
 
 
-/* =========================================================
+/*
+   Combo
+*/
+
+let combo = 0;
+
+
+/*
+   Oyun
+*/
+
+let paused = false;
+
+let gameOver = false;
+
+
+/*
+   Ses
+*/
+
+let soundEnabled = true;
+
+let audioContext = null;
+
+
+/*
+   Titreşim
+*/
+
+let vibrationEnabled =
+    localStorage.getItem(
+        "blockBlastVibration"
+    ) !== "off";
+
+
+/*
+   Sürükleme
+*/
+
+let drag = null;
+
+
+/*
+   Çift dokunma
+*/
+
+let lastTapTime = 0;
+
+let lastTapIndex = -1;
+
+
+/*
+   Tema
+*/
+
+let currentTheme =
+    localStorage.getItem(
+        "blockBlastTheme"
+    ) || "neon";
+
+
+/* =====================================================
+   ELEMENTLER
+===================================================== */
+
+const boardElement =
+    document.getElementById(
+        "board"
+    );
+
+
+const piecesElement =
+    document.getElementById(
+        "pieces"
+    );
+
+
+const scoreElement =
+    document.getElementById(
+        "score"
+    );
+
+
+const bestElement =
+    document.getElementById(
+        "best"
+    );
+
+
+const comboElement =
+    document.getElementById(
+        "combo"
+    );
+
+
+const comboBox =
+    document.getElementById(
+        "comboBox"
+    );
+
+
+const messageElement =
+    document.getElementById(
+        "message"
+    );
+
+
+const comboMessageElement =
+    document.getElementById(
+        "comboMessage"
+    );
+
+
+const particlesElement =
+    document.getElementById(
+        "particles"
+    );
+
+
+const themeSelect =
+    document.getElementById(
+        "themeSelect"
+    );
+
+
+/* =====================================================
+   TEMA
+===================================================== */
+
+function applyTheme(theme){
+
+    const validThemes = [
+
+        "neon",
+        "space",
+        "fire",
+        "ice",
+        "cyberpunk"
+
+    ];
+
+
+    if(
+        !validThemes.includes(theme)
+    ){
+
+        theme = "neon";
+    }
+
+
+    currentTheme = theme;
+
+
+    document.body.dataset.theme =
+        theme;
+
+
+    themeSelect.value =
+        theme;
+
+
+    localStorage.setItem(
+        "blockBlastTheme",
+        theme
+    );
+}
+
+
+themeSelect.addEventListener(
+    "change",
+    event => {
+
+        applyTheme(
+            event.target.value
+        );
+
+        sound(
+            600,
+            .07,
+            "sine",
+            .025
+        );
+    }
+);
+
+
+/* =====================================================
+   TİTREŞİM
+===================================================== */
+
+function vibrate(pattern){
+
+    if(
+        !vibrationEnabled
+    ){
+
+        return;
+    }
+
+
+    if(
+        "vibrate" in navigator
+    ){
+
+        try{
+
+            navigator.vibrate(
+                pattern
+            );
+
+        }catch(error){
+
+            /* Tarayıcı titreşimi desteklemiyorsa
+               oyunun çalışmasını engelleme. */
+
+        }
+    }
+}
+
+
+function updateVibrationButton(){
+
+    const button =
+        document.getElementById(
+            "vibrationBtn"
+        );
+
+
+    button.textContent =
+        vibrationEnabled
+            ? "📳 TİTREŞİM"
+            : "📴 TİTREŞİM KAPALI";
+}
+
+
+document
+    .getElementById(
+        "vibrationBtn"
+    )
+    .onclick = () => {
+
+        vibrationEnabled =
+            !vibrationEnabled;
+
+
+        localStorage.setItem(
+            "blockBlastVibration",
+            vibrationEnabled
+                ? "on"
+                : "off"
+        );
+
+
+        updateVibrationButton();
+
+
+        if(
+            vibrationEnabled
+        ){
+
+            vibrate(30);
+        }
+    };
+
+
+/* =====================================================
    SES
-   ========================================================= */
+===================================================== */
 
 function startAudio(){
 
-    if(!soundOn) return;
+    if(
+        !soundEnabled
+    ){
 
-    if(!audio){
-        audio = new (
-            window.AudioContext ||
-            window.webkitAudioContext
-        )();
+        return;
     }
 
-    if(audio.state === "suspended"){
-        audio.resume();
+
+    if(!audioContext){
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+    }
+
+
+    if(
+        audioContext.state ===
+        "suspended"
+    ){
+
+        audioContext.resume();
     }
 }
 
-function beep(
+
+function sound(
     frequency,
-    duration = .08,
-    type = "sine",
-    volume = .04
+    duration=.08,
+    type="sine",
+    volume=.04
 ){
 
-    if(!soundOn) return;
+    if(
+        !soundEnabled
+    ){
+
+        return;
+    }
+
 
     startAudio();
 
-    const oscillator = audio.createOscillator();
-    const gain = audio.createGain();
 
-    oscillator.type = type;
-    oscillator.frequency.value = frequency;
+    if(!audioContext){
+
+        return;
+    }
+
+
+    const oscillator =
+        audioContext
+            .createOscillator();
+
+
+    const gain =
+        audioContext
+            .createGain();
+
+
+    oscillator.type =
+        type;
+
+
+    oscillator.frequency.value =
+        frequency;
+
 
     gain.gain.setValueAtTime(
         volume,
-        audio.currentTime
+        audioContext.currentTime
     );
+
 
     gain.gain.exponentialRampToValueAtTime(
         .001,
-        audio.currentTime + duration
+        audioContext.currentTime +
+        duration
     );
 
+
     oscillator.connect(gain);
-    gain.connect(audio.destination);
+
+    gain.connect(
+        audioContext.destination
+    );
+
 
     oscillator.start();
 
+
     oscillator.stop(
-        audio.currentTime + duration
+        audioContext.currentTime +
+        duration
     );
 }
 
 
-/* =========================================================
-   YENİ OYUN
-   ========================================================= */
+/* =====================================================
+   SKOR GEÇMİŞİ
+===================================================== */
 
-function createEmptyBoard(){
+function loadScoreHistory(){
 
-    board = [];
+    try{
 
-    for(let r=0;r<SIZE;r++){
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    "blockBlastScoreHistory"
+                ) || "[]"
+            );
 
-        const row=[];
 
-        for(let c=0;c<SIZE;c++){
-            row.push(null);
+        if(
+            !Array.isArray(saved)
+        ){
+
+            return [];
         }
 
-        board.push(row);
+
+        return saved
+            .filter(
+                value =>
+                    Number.isFinite(
+                        Number(value)
+                    )
+            )
+            .map(
+                value =>
+                    Number(value)
+            )
+            .slice(0,5);
+
+    }catch(error){
+
+        return [];
     }
 }
 
-function randomPiece(){
 
-    const source =
+function saveScoreHistory(){
+
+    localStorage.setItem(
+        "blockBlastScoreHistory",
+        JSON.stringify(
+            scoreHistory
+        )
+    );
+}
+
+
+function addScoreToHistory(
+    finalScore
+){
+
+    if(
+        !Number.isFinite(
+            finalScore
+        ) ||
+        finalScore <= 0
+    ){
+
+        return;
+    }
+
+
+    scoreHistory.unshift(
+        finalScore
+    );
+
+
+    scoreHistory =
+        scoreHistory.slice(
+            0,
+            5
+        );
+
+
+    saveScoreHistory();
+}
+
+
+function renderScoreHistory(){
+
+    const container =
+        document.getElementById(
+            "scoreHistory"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if(
+        scoreHistory.length === 0
+    ){
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "historyItem";
+
+
+        empty.textContent =
+            "Henüz skor yok";
+
+
+        container.appendChild(
+            empty
+        );
+
+
+        return;
+    }
+
+
+    scoreHistory.forEach(
+        (value,index) => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "historyItem";
+
+
+            const rank =
+                document.createElement(
+                    "span"
+                );
+
+
+            rank.className =
+                "historyRank";
+
+
+            rank.textContent =
+                "#"+(index+1);
+
+
+            const scoreText =
+                document.createElement(
+                    "span"
+                );
+
+
+            scoreText.className =
+                "historyScore";
+
+
+            scoreText.textContent =
+                Number(value)
+                    .toLocaleString(
+                        "tr-TR"
+                    );
+
+
+            item.appendChild(
+                rank
+            );
+
+
+            item.appendChild(
+                scoreText
+            );
+
+
+            container.appendChild(
+                item
+            );
+        }
+    );
+}
+
+
+/* =====================================================
+   TAHTA
+===================================================== */
+
+function createBoard(){
+
+    board = [];
+
+
+    for(
+        let r=0;
+        r<SIZE;
+        r++
+    ){
+
+        board[r] = [];
+
+
+        for(
+            let c=0;
+            c<SIZE;
+            c++
+        ){
+
+            board[r][c] = null;
+        }
+    }
+}
+
+
+/* =====================================================
+   PARÇA ÜRET
+===================================================== */
+
+function createPiece(){
+
+    const original =
         SHAPES[
             Math.floor(
-                Math.random()*SHAPES.length
+                Math.random() *
+                SHAPES.length
             )
         ];
 
+
     return {
-        shape: source.map(row => [...row]),
+
+        shape:
+            original.map(
+                row => [...row]
+            ),
+
         color:
             COLORS[
                 Math.floor(
-                    Math.random()*COLORS.length
+                    Math.random() *
+                    COLORS.length
                 )
             ]
+
     };
 }
 
-function createPieces(){
 
-    pieces=[
-        randomPiece(),
-        randomPiece(),
-        randomPiece()
+function createThreePieces(){
+
+    pieces = [
+
+        createPiece(),
+
+        createPiece(),
+
+        createPiece()
+
     ];
 }
 
-function newGame(){
 
-    createEmptyBoard();
-    createPieces();
+/* =====================================================
+   KOMBO
+===================================================== */
 
-    score=0;
-    paused=false;
-    ended=false;
+function resetCombo(){
+
+    combo = 0;
+
+    comboBox.classList.remove(
+        "active"
+    );
+
+    comboElement.textContent =
+        "x1";
+}
+
+
+function increaseCombo(){
+
+    combo++;
+
+
+    if(
+        combo >= 2
+    ){
+
+        comboBox.classList.remove(
+            "active"
+        );
+
+
+        void comboBox.offsetWidth;
+
+
+        comboBox.classList.add(
+            "active"
+        );
+
+
+        comboElement.textContent =
+            "x"+combo;
+
+
+        showComboMessage(
+            "🔥 COMBO x"+combo+"!"
+        );
+
+
+        /*
+           Combo yükseldikçe
+           biraz daha güçlü titreşim.
+        */
+
+        vibrate(
+            combo >= 4
+                ? [40,30,70]
+                : [35,25,45]
+        );
+
+    }else{
+
+        comboElement.textContent =
+            "x1";
+    }
+}
+
+
+function showComboMessage(text){
+
+    comboMessageElement.textContent =
+        text;
+
+
+    comboMessageElement.classList.remove(
+        "show"
+    );
+
+
+    void comboMessageElement.offsetWidth;
+
+
+    comboMessageElement.classList.add(
+        "show"
+    );
+}
+
+
+/* =====================================================
+   YENİ OYUN
+===================================================== */
+
+function startGame(){
+
+    cancelDrag(false);
+
+
+    createBoard();
+
+
+    createThreePieces();
+
+
+    score = 0;
+
+
+    resetCombo();
+
+
+    paused = false;
+
+
+    gameOver = false;
+
 
     document
-        .getElementById("gameOver")
-        .classList.remove("show");
+        .getElementById(
+            "gameOver"
+        )
+        .classList.remove(
+            "show"
+        );
+
 
     document
-        .getElementById("pause")
-        .textContent="⏸ DURAKLAT";
+        .getElementById(
+            "pauseBtn"
+        )
+        .textContent =
+            "⏸ DURAKLAT";
+
 
     updateScore();
 
-    drawBoard();
-    drawPieces();
+
+    renderBoard();
+
+
+    renderPieces();
 }
 
-newGame();
 
-
-/* =========================================================
+/* =====================================================
    TAHTAYI ÇİZ
-   ========================================================= */
+===================================================== */
 
-function drawBoard(preview=null){
+function renderBoard(
+    preview=null
+){
 
-    const boardElement =
-        document.getElementById("board");
+    boardElement.innerHTML =
+        "";
 
-    boardElement.innerHTML="";
 
-    for(let r=0;r<SIZE;r++){
+    for(
+        let r=0;
+        r<SIZE;
+        r++
+    ){
 
-        for(let c=0;c<SIZE;c++){
+        for(
+            let c=0;
+            c<SIZE;
+            c++
+        ){
 
             const cell =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
-            cell.className="cell";
 
-            const value=board[r][c];
+            cell.className =
+                "boardCell";
 
-            if(value){
 
-                cell.classList.add("block");
+            if(
+                board[r][c]
+            ){
 
-                cell.style.background =
-                    value.color;
+                const block =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                block.className =
+                    "boardBlock";
+
+
+                block.style.background =
+                    board[r][c].color;
+
+
+                cell.appendChild(
+                    block
+                );
             }
+
 
             if(preview){
 
-                const isPreview =
+                const hit =
                     preview.cells.some(
-                        p =>
-                            p.r===r &&
-                            p.c===c
+                        position =>
+                            position.r === r &&
+                            position.c === c
                     );
 
-                if(isPreview){
+
+                if(hit){
 
                     cell.classList.add(
                         preview.valid
@@ -631,102 +2253,331 @@ function drawBoard(preview=null){
                 }
             }
 
-            boardElement.appendChild(cell);
+
+            boardElement.appendChild(
+                cell
+            );
         }
     }
 }
 
 
-/* =========================================================
-   ALTTAKİ PARÇALAR
-   ========================================================= */
+/* =====================================================
+   ALT PARÇALARI ÇİZ
+===================================================== */
 
-function drawPieces(){
+function renderPieces(){
 
-    const container =
-        document.getElementById("pieces");
+    piecesElement.innerHTML =
+        "";
 
-    container.innerHTML="";
 
-    pieces.forEach((piece,index)=>{
+    pieces.forEach(
+        (piece,index) => {
 
-        const slot =
-            document.createElement("div");
+            const slot =
+                document.createElement(
+                    "div"
+                );
 
-        slot.className="slot";
 
-        if(!piece){
+            slot.className =
+                "pieceSlot";
 
-            container.appendChild(slot);
-            return;
-        }
 
-        const element =
-            document.createElement("div");
+            if(!piece){
 
-        element.className="piece";
+                piecesElement.appendChild(
+                    slot
+                );
 
-        const rows=piece.shape.length;
-        const cols=piece.shape[0].length;
 
-        element.style.gridTemplateColumns =
-            `repeat(${cols},23px)`;
-
-        element.style.gridTemplateRows =
-            `repeat(${rows},23px)`;
-
-        for(let r=0;r<rows;r++){
-
-            for(let c=0;c<cols;c++){
-
-                if(!piece.shape[r][c]){
-                    continue;
-                }
-
-                const block =
-                    document.createElement("div");
-
-                block.className="block";
-
-                block.style.background =
-                    piece.color;
-
-                block.style.gridRow =
-                    r+1;
-
-                block.style.gridColumn =
-                    c+1;
-
-                element.appendChild(block);
+                return;
             }
-        }
 
-        slot.appendChild(element);
-        container.appendChild(slot);
 
-        /*
-          Burada EN ÖNEMLİ şey:
-          Orijinal parçayı taşımıyoruz.
+            const element =
+                document.createElement(
+                    "div"
+                );
 
-          Sadece clone oluşturuyoruz.
-        */
 
-        element.addEventListener(
-            "pointerdown",
-            event => beginDrag(
-                event,
-                index,
-                piece,
+            element.className =
+                "piece";
+
+
+            const rows =
+                piece.shape.length;
+
+
+            const cols =
+                piece.shape[0].length;
+
+
+            element.style.gridTemplateColumns =
+                `repeat(${cols},23px)`;
+
+
+            element.style.gridTemplateRows =
+                `repeat(${rows},23px)`;
+
+
+            for(
+                let r=0;
+                r<rows;
+                r++
+            ){
+
+                for(
+                    let c=0;
+                    c<cols;
+                    c++
+                ){
+
+                    if(
+                        !piece.shape[r][c]
+                    ){
+
+                        continue;
+                    }
+
+
+                    const block =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    block.className =
+                        "miniBlock";
+
+
+                    block.style.background =
+                        piece.color;
+
+
+                    block.style.gridRow =
+                        r+1;
+
+
+                    block.style.gridColumn =
+                        c+1;
+
+
+                    element.appendChild(
+                        block
+                    );
+                }
+            }
+
+
+            slot.appendChild(
                 element
-            )
-        );
-    });
+            );
+
+
+            piecesElement.appendChild(
+                slot
+            );
+
+
+            /*
+               Çift dokunma ile döndürme
+            */
+
+            element.addEventListener(
+                "pointerdown",
+                event => {
+
+                    const now =
+                        Date.now();
+
+
+                    if(
+                        now-lastTapTime < 330 &&
+                        lastTapIndex === index
+                    ){
+
+                        event.preventDefault();
+
+
+                        if(
+                            !paused &&
+                            !gameOver
+                        ){
+
+                            rotatePieceInSlot(
+                                index,
+                                1
+                            );
+                        }
+
+
+                        lastTapTime = 0;
+
+                        lastTapIndex = -1;
+
+
+                        return;
+                    }
+
+
+                    lastTapTime = now;
+
+                    lastTapIndex = index;
+
+
+                    beginDrag(
+                        event,
+                        index,
+                        piece,
+                        element
+                    );
+                }
+            );
+        }
+    );
 }
 
 
-/* =========================================================
+/* =====================================================
+   PARÇA DÖNDÜRME
+===================================================== */
+
+function rotateShape(
+    shape,
+    direction=1
+){
+
+    const rows =
+        shape.length;
+
+
+    const cols =
+        shape[0].length;
+
+
+    const rotated = [];
+
+
+    if(
+        direction === 1
+    ){
+
+        /*
+           SAĞA 90°
+        */
+
+        for(
+            let c=0;
+            c<cols;
+            c++
+        ){
+
+            const row = [];
+
+
+            for(
+                let r=rows-1;
+                r>=0;
+                r--
+            ){
+
+                row.push(
+                    shape[r][c]
+                );
+            }
+
+
+            rotated.push(
+                row
+            );
+        }
+
+    }else{
+
+        /*
+           SOLA 90°
+        */
+
+        for(
+            let c=cols-1;
+            c>=0;
+            c--
+        ){
+
+            const row = [];
+
+
+            for(
+                let r=0;
+                r<rows;
+                r++
+            ){
+
+                row.push(
+                    shape[r][c]
+                );
+            }
+
+
+            rotated.push(
+                row
+            );
+        }
+    }
+
+
+    return rotated;
+}
+
+
+/* =====================================================
+   ALTTAKİ PARÇAYI DÖNDÜR
+===================================================== */
+
+function rotatePieceInSlot(
+    index,
+    direction
+){
+
+    if(
+        paused ||
+        gameOver ||
+        !pieces[index]
+    ){
+
+        return;
+    }
+
+
+    pieces[index].shape =
+        rotateShape(
+            pieces[index].shape,
+            direction
+        );
+
+
+    renderPieces();
+
+
+    sound(
+        direction === 1
+            ? 550
+            : 430,
+        .07,
+        "square",
+        .025
+    );
+
+
+    vibrate(20);
+}
+
+
+/* =====================================================
    SÜRÜKLEME BAŞLAT
-   ========================================================= */
+===================================================== */
 
 function beginDrag(
     event,
@@ -735,151 +2586,387 @@ function beginDrag(
     original
 ){
 
-    if(paused || ended) return;
+    if(
+        paused ||
+        gameOver
+    ){
+
+        return;
+    }
+
 
     startAudio();
 
-    /*
-      Eski sürükleme varsa temizle.
-    */
 
-    cancelDrag();
+    cancelDrag(false);
 
-    /*
-      Orijinal parçanın KOPYASINI oluştur.
-    */
 
     const clone =
-        original.cloneNode(true);
+        original.cloneNode(
+            true
+        );
 
-    clone.classList.add("dragClone");
 
-    document.body.appendChild(clone);
+    clone.classList.add(
+        "dragPiece"
+    );
 
-    dragging={
+
+    document.body.appendChild(
+        clone
+    );
+
+
+    drag = {
+
         index:index,
+
         piece:piece,
-        original:original,
-        clone:clone
+
+        clone:clone,
+
+        lastX:event.clientX,
+
+        lastY:event.clientY
+
     };
 
-    updateDrag(
+
+    moveDrag(
         event.clientX,
         event.clientY
     );
+
 
     event.preventDefault();
 }
 
 
-/* =========================================================
-   SÜRÜKLEME
-   ========================================================= */
+/* =====================================================
+   SÜRÜKLENEN PARÇAYI YENİDEN ÇİZ
+===================================================== */
 
-document.addEventListener(
-    "pointermove",
-    event => {
+function rebuildDragClone(){
 
-        if(!dragging) return;
+    if(!drag){
 
-        updateDrag(
-            event.clientX,
-            event.clientY
-        );
-    }
-);
-
-document.addEventListener(
-    "pointerup",
-    event => {
-
-        if(!dragging) return;
-
-        finishDrag(
-            event.clientX,
-            event.clientY
-        );
-    }
-);
-
-document.addEventListener(
-    "pointercancel",
-    () => cancelDrag()
-);
-
-
-/* =========================================================
-   SÜRÜKLENEN PARÇAYI HAREKET ETTİR
-   ========================================================= */
-
-function updateDrag(x,y){
-
-    if(!dragging) return;
-
-    const clone=dragging.clone;
-
-    clone.style.left=x+"px";
-    clone.style.top=y+"px";
-
-    const position =
-        getBoardPosition(x,y);
-
-    if(!position){
-
-        drawBoard();
         return;
     }
 
-    const valid =
-        canPlace(
-            dragging.piece.shape,
-            position.r,
-            position.c
+
+    const oldClone =
+        drag.clone;
+
+
+    const clone =
+        document.createElement(
+            "div"
         );
 
-    const cells=[];
+
+    clone.className =
+        "piece dragPiece";
+
+
+    const rows =
+        drag.piece.shape.length;
+
+
+    const cols =
+        drag.piece.shape[0].length;
+
+
+    clone.style.gridTemplateColumns =
+        `repeat(${cols},23px)`;
+
+
+    clone.style.gridTemplateRows =
+        `repeat(${rows},23px)`;
+
+
+    clone.style.left =
+        drag.lastX+"px";
+
+
+    clone.style.top =
+        drag.lastY+"px";
+
 
     for(
         let r=0;
-        r<dragging.piece.shape.length;
+        r<rows;
         r++
     ){
 
         for(
             let c=0;
-            c<dragging.piece.shape[r].length;
+            c<cols;
             c++
         ){
 
-            if(!dragging.piece.shape[r][c]){
+            if(
+                !drag.piece.shape[r][c]
+            ){
+
                 continue;
             }
 
-            cells.push({
-                r:position.r+r,
-                c:position.c+c
+
+            const block =
+                document.createElement(
+                    "div"
+                );
+
+
+            block.className =
+                "miniBlock";
+
+
+            block.style.background =
+                drag.piece.color;
+
+
+            block.style.gridRow =
+                r+1;
+
+
+            block.style.gridColumn =
+                c+1;
+
+
+            clone.appendChild(
+                block
+            );
+        }
+    }
+
+
+    document.body.appendChild(
+        clone
+    );
+
+
+    oldClone.remove();
+
+
+    drag.clone =
+        clone;
+}
+
+
+/* =====================================================
+   SÜRÜKLENEN PARÇAYI DÖNDÜR
+===================================================== */
+
+function rotateDraggedPiece(
+    direction
+){
+
+    if(
+        !drag ||
+        paused ||
+        gameOver
+    ){
+
+        return;
+    }
+
+
+    drag.piece.shape =
+        rotateShape(
+            drag.piece.shape,
+            direction
+        );
+
+
+    rebuildDragClone();
+
+
+    moveDrag(
+        drag.lastX,
+        drag.lastY
+    );
+
+
+    sound(
+        direction === 1
+            ? 550
+            : 430,
+        .06,
+        "square",
+        .025
+    );
+
+
+    vibrate(20);
+}
+
+
+/* =====================================================
+   SÜRÜKLEME
+===================================================== */
+
+document.addEventListener(
+    "pointermove",
+    event => {
+
+        if(!drag){
+
+            return;
+        }
+
+
+        moveDrag(
+            event.clientX,
+            event.clientY
+        );
+
+
+        event.preventDefault();
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+document.addEventListener(
+    "pointerup",
+    event => {
+
+        if(!drag){
+
+            return;
+        }
+
+
+        dropPiece(
+            event.clientX,
+            event.clientY
+        );
+    }
+);
+
+
+document.addEventListener(
+    "pointercancel",
+    () => {
+
+        cancelDrag();
+    }
+);
+
+
+/* =====================================================
+   SÜRÜKLEME HAREKETİ
+===================================================== */
+
+function moveDrag(x,y){
+
+    if(!drag){
+
+        return;
+    }
+
+
+    drag.lastX = x;
+
+    drag.lastY = y;
+
+
+    drag.clone.style.left =
+        x+"px";
+
+
+    drag.clone.style.top =
+        y+"px";
+
+
+    const position =
+        getPositionOnBoard(
+            x,
+            y
+        );
+
+
+    if(!position){
+
+        renderBoard();
+
+        return;
+    }
+
+
+    const valid =
+        canPlace(
+            drag.piece.shape,
+            position.r,
+            position.c
+        );
+
+
+    const previewCells = [];
+
+
+    for(
+        let r=0;
+        r<drag.piece.shape.length;
+        r++
+    ){
+
+        for(
+            let c=0;
+            c<drag.piece.shape[r].length;
+            c++
+        ){
+
+            if(
+                !drag.piece.shape[r][c]
+            ){
+
+                continue;
+            }
+
+
+            previewCells.push({
+
+                r:
+                    position.r+r,
+
+                c:
+                    position.c+c
+
             });
         }
     }
 
-    drawBoard({
-        cells:cells,
-        valid:valid
+
+    renderBoard({
+
+        cells:
+            previewCells,
+
+        valid:
+            valid
+
     });
 }
 
 
-/* =========================================================
-   TAHTADAKİ HÜCREYİ BUL
-   ========================================================= */
+/* =====================================================
+   TAHTA POZİSYONU
+===================================================== */
 
-function getBoardPosition(x,y){
-
-    const boardElement =
-        document.getElementById("board");
+function getPositionOnBoard(
+    x,
+    y
+){
 
     const rect =
-        boardElement.getBoundingClientRect();
+        boardElement
+            .getBoundingClientRect();
+
 
     if(
         x < rect.left ||
@@ -887,46 +2974,68 @@ function getBoardPosition(x,y){
         y < rect.top ||
         y > rect.bottom
     ){
+
         return null;
     }
 
+
     const cellWidth =
-        rect.width/SIZE;
+        rect.width /
+        SIZE;
+
 
     const cellHeight =
-        rect.height/SIZE;
+        rect.height /
+        SIZE;
 
-    let c=Math.floor(
-        (x-rect.left)/cellWidth
-    );
 
-    let r=Math.floor(
-        (y-rect.top)/cellHeight
-    );
+    let c =
+        Math.floor(
+            (x-rect.left) /
+            cellWidth
+        );
+
+
+    let r =
+        Math.floor(
+            (y-rect.top) /
+            cellHeight
+        );
+
 
     /*
-      Parçayı imlecin ortasına getiriyoruz.
+       Parçanın merkezini
+       imlecin altına getir.
     */
 
-    const shape=dragging.piece.shape;
-
     c -= Math.floor(
-        shape[0].length/2
+        drag.piece.shape[0].length /
+        2
     );
+
 
     r -= Math.floor(
-        shape.length/2
+        drag.piece.shape.length /
+        2
     );
 
-    return {r,c};
+
+    return {
+        r:r,
+        c:c
+    };
 }
 
 
-/* =========================================================
+/* =====================================================
    YERLEŞEBİLİR Mİ?
-   ========================================================= */
+===================================================== */
 
-function canPlace(shape,startR,startC){
+function canPlace(
+    shape,
+    startR,
+    startC
+){
 
     for(
         let r=0;
@@ -940,639 +3049,1346 @@ function canPlace(shape,startR,startC){
             c++
         ){
 
-            if(!shape[r][c]){
+            if(
+                !shape[r][c]
+            ){
+
                 continue;
             }
 
-            const boardR=startR+r;
-            const boardC=startC+c;
+
+            const boardR =
+                startR+r;
+
+
+            const boardC =
+                startC+c;
+
 
             if(
-                boardR<0 ||
-                boardR>=SIZE ||
-                boardC<0 ||
-                boardC>=SIZE
+                boardR < 0 ||
+                boardR >= SIZE ||
+                boardC < 0 ||
+                boardC >= SIZE
             ){
+
                 return false;
             }
 
-            if(board[boardR][boardC]){
+
+            if(
+                board[boardR][boardC]
+            ){
+
                 return false;
             }
         }
     }
+
 
     return true;
 }
 
 
-/* =========================================================
-   SÜRÜKLEMEYİ BİTİR
-   ========================================================= */
+/* =====================================================
+   PARÇAYI BIRAK
+===================================================== */
 
-function finishDrag(x,y){
+function dropPiece(x,y){
 
-    if(!dragging) return;
+    if(!drag){
+
+        return;
+    }
+
+
+    const currentDrag =
+        drag;
+
 
     const position =
-        getBoardPosition(x,y);
+        getPositionOnBoard(
+            x,
+            y
+        );
+
+
+    let successful = false;
+
 
     if(
         position &&
         canPlace(
-            dragging.piece.shape,
+            currentDrag.piece.shape,
             position.r,
             position.c
         )
     ){
 
+        successful = true;
+
+
         /*
-          GERÇEKTEN YERLEŞTİR
+           Tahtaya koy
         */
 
-        putPiece(
-            dragging.index,
-            dragging.piece,
-            position.r,
-            position.c
+        for(
+            let r=0;
+            r<currentDrag.piece.shape.length;
+            r++
+        ){
+
+            for(
+                let c=0;
+                c<currentDrag.piece.shape[r].length;
+                c++
+            ){
+
+                if(
+                    !currentDrag
+                        .piece
+                        .shape[r][c]
+                ){
+
+                    continue;
+                }
+
+
+                board[
+                    position.r+r
+                ][
+                    position.c+c
+                ] = {
+
+                    color:
+                        currentDrag
+                            .piece
+                            .color
+
+                };
+            }
+        }
+
+
+        /*
+           Parçayı tüket
+        */
+
+        pieces[
+            currentDrag.index
+        ] = null;
+
+
+        /*
+           Blok puanı
+        */
+
+        const blockCount =
+            currentDrag
+                .piece
+                .shape
+                .flat()
+                .filter(Boolean)
+                .length;
+
+
+        score +=
+            blockCount;
+
+
+        sound(
+            260,
+            .06,
+            "square",
+            .025
+        );
+
+
+        /*
+           Hafif titreşim
+        */
+
+        vibrate(20);
+
+
+        setTimeout(
+            () => {
+
+                sound(
+                    390,
+                    .07,
+                    "square",
+                    .02
+                );
+
+            },
+            40
+        );
+    }
+
+
+    /*
+       Kopyayı sil
+    */
+
+    if(
+        currentDrag.clone
+    ){
+
+        currentDrag.clone.remove();
+    }
+
+
+    drag = null;
+
+
+    if(successful){
+
+        renderBoard();
+
+        renderPieces();
+
+        updateScore();
+
+
+        /*
+           Satır/sütun kontrolü
+        */
+
+        setTimeout(
+            clearCompletedLines,
+            80
+        );
+
+
+        /*
+           3 parça bitti
+        */
+
+        if(
+            pieces.every(
+                piece =>
+                    piece === null
+            )
+        ){
+
+            setTimeout(
+                () => {
+
+                    createThreePieces();
+
+                    renderPieces();
+
+                },
+                200
+            );
+        }
+
+
+        /*
+           Game Over kontrolü
+        */
+
+        setTimeout(
+            checkGameOver,
+            400
         );
 
     }else{
 
         /*
-          Geçersiz yere bırakıldı.
-          Tahta eski haline döner.
+           Yanlış bırakma:
+           combo sıfırlanır.
         */
 
-        drawBoard();
+        resetCombo();
+
+        renderBoard();
     }
-
-    /*
-      KOPYA HER DURUMDA SİLİNİR.
-      Böylece küçük/hayalet parça kalmaz.
-    */
-
-    if(dragging.clone){
-        dragging.clone.remove();
-    }
-
-    dragging=null;
-
-    /*
-      Parça alanını yeniden çiz.
-      Yerleştirilen parça burada kaybolur.
-    */
-
-    drawPieces();
 }
 
 
-/* =========================================================
-   SÜRÜKLEMEYİ İPTAL
-   ========================================================= */
+/* =====================================================
+   SÜRÜKLEME İPTAL
+===================================================== */
 
-function cancelDrag(){
-
-    if(!dragging) return;
-
-    if(dragging.clone){
-        dragging.clone.remove();
-    }
-
-    dragging=null;
-
-    drawBoard();
-}
-
-
-/* =========================================================
-   PARÇAYI TAHTAYA KOY
-   ========================================================= */
-
-function putPiece(
-    index,
-    piece,
-    startR,
-    startC
+function cancelDrag(
+    redraw=true
 ){
 
-    let blocks=0;
+    if(!drag){
+
+        return;
+    }
+
+
+    if(
+        drag.clone
+    ){
+
+        drag.clone.remove();
+    }
+
+
+    drag = null;
+
+
+    if(redraw){
+
+        renderBoard();
+    }
+}
+
+
+/* =====================================================
+   SATIR / SÜTUN TEMİZLE
+===================================================== */
+
+function clearCompletedLines(){
+
+    const rows = [];
+
+    const columns = [];
+
+
+    /*
+       Satırlar
+    */
 
     for(
         let r=0;
-        r<piece.shape.length;
+        r<SIZE;
         r++
     ){
 
+        let full = true;
+
+
         for(
             let c=0;
-            c<piece.shape[r].length;
+            c<SIZE;
             c++
         ){
 
-            if(!piece.shape[r][c]){
-                continue;
-            }
+            if(
+                !board[r][c]
+            ){
 
-            board[startR+r][startC+c]={
-                color:piece.color
-            };
+                full = false;
 
-            blocks++;
-        }
-    }
-
-    /*
-      Aşağıdaki parçayı tüket.
-    */
-
-    pieces[index]=null;
-
-    /*
-      Puan.
-    */
-
-    score+=blocks;
-
-    beep(
-        250,
-        .05,
-        "square",
-        .025
-    );
-
-    setTimeout(
-        () => beep(
-            380,
-            .06,
-            "square",
-            .02
-        ),
-        40
-    );
-
-    drawBoard();
-
-    updateScore();
-
-    /*
-      Satır/sütun temizle.
-    */
-
-    setTimeout(
-        clearLines,
-        80
-    );
-
-    /*
-      Üç parça da kullanıldıysa
-      yeni üç parça üret.
-    */
-
-    if(pieces.every(p => p===null)){
-
-        setTimeout(
-            () => {
-                createPieces();
-                drawPieces();
-            },
-            180
-        );
-    }
-
-    setTimeout(
-        checkGameOver,
-        300
-    );
-}
-
-
-/* =========================================================
-   SATIR / SÜTUN TEMİZLE
-   ========================================================= */
-
-function clearLines(){
-
-    const rows=[];
-    const cols=[];
-
-    for(let r=0;r<SIZE;r++){
-
-        if(
-            board[r].every(
-                cell => cell!==null
-            )
-        ){
-            rows.push(r);
-        }
-    }
-
-    for(let c=0;c<SIZE;c++){
-
-        let full=true;
-
-        for(let r=0;r<SIZE;r++){
-
-            if(!board[r][c]){
-                full=false;
                 break;
             }
         }
 
+
         if(full){
-            cols.push(c);
+
+            rows.push(r);
         }
     }
 
-    const total=
-        rows.length+
-        cols.length;
 
-    if(total===0){
+    /*
+       Sütunlar
+    */
+
+    for(
+        let c=0;
+        c<SIZE;
+        c++
+    ){
+
+        let full = true;
+
+
+        for(
+            let r=0;
+            r<SIZE;
+            r++
+        ){
+
+            if(
+                !board[r][c]
+            ){
+
+                full = false;
+
+                break;
+            }
+        }
+
+
+        if(full){
+
+            columns.push(c);
+        }
+    }
+
+
+    const total =
+        rows.length +
+        columns.length;
+
+
+    /*
+       Hiçbir şey temizlenmediyse
+       combo sıfırlanır.
+    */
+
+    if(
+        total === 0
+    ){
+
+        resetCombo();
+
+        checkGameOver();
+
         return;
     }
 
-    const remove=new Set();
 
-    rows.forEach(r => {
+    /*
+       Combo artır
+    */
 
-        for(let c=0;c<SIZE;c++){
+    increaseCombo();
 
-            remove.add(
-                r+","+c
-            );
+
+    /*
+       Silinecek hücreler
+    */
+
+    const remove =
+        new Set();
+
+
+    rows.forEach(
+        r => {
+
+            for(
+                let c=0;
+                c<SIZE;
+                c++
+            ){
+
+                remove.add(
+                    r+","+c
+                );
+            }
         }
-    });
+    );
 
-    cols.forEach(c => {
 
-        for(let r=0;r<SIZE;r++){
+    columns.forEach(
+        c => {
 
-            remove.add(
-                r+","+c
-            );
+            for(
+                let r=0;
+                r<SIZE;
+                r++
+            ){
+
+                remove.add(
+                    r+","+c
+                );
+            }
         }
-    });
+    );
 
-    remove.forEach(key => {
 
-        const parts=
-            key.split(",");
+    /*
+       Patlama
+    */
 
-        const r=Number(parts[0]);
-        const c=Number(parts[1]);
+    remove.forEach(
+        key => {
 
-        createParticles(
-            r,
-            c,
-            board[r][c]?.color || "#fff"
+            const [r,c] =
+                key
+                    .split(",")
+                    .map(Number);
+
+
+            createParticles(
+                r,
+                c,
+                board[r][c]
+                    ?.color ||
+                "#ffffff"
+            );
+
+
+            board[r][c] = null;
+        }
+    );
+
+
+    /*
+       =================================================
+       KOMBO PUANI
+       =================================================
+
+       İlk temizlik:
+       x1
+
+       İkinci arka arkaya:
+       x2
+
+       Üçüncü:
+       x3
+
+       ...
+    */
+
+    const multiplier =
+        Math.max(
+            1,
+            combo
         );
 
-        board[r][c]=null;
-    });
 
-    score += total*100;
+    let lineScore =
+        total *
+        100 *
+        multiplier;
 
-    if(total>=2){
-        score += total*50;
+
+    /*
+       Birden fazla satır/sütun
+       için ekstra bonus.
+    */
+
+    if(
+        total >= 2
+    ){
+
+        lineScore +=
+            total *
+            50 *
+            multiplier;
+    }
+
+
+    score +=
+        lineScore;
+
+
+    /*
+       Titreşim:
+       tek temizlik hafif,
+       combo güçlü.
+    */
+
+    if(
+        combo >= 4
+    ){
+
+        vibrate([
+            40,
+            30,
+            60,
+            30,
+            90
+        ]);
+
+    }else if(
+        combo >= 2
+    ){
+
+        vibrate([
+            40,
+            30,
+            60
+        ]);
+
+    }else{
+
+        vibrate(80);
+    }
+
+
+    /*
+       Normal mesaj
+    */
+
+    if(
+        total >= 3
+    ){
 
         showMessage(
-            total>=3
-                ? "🔥 MEGA!"
-                : "✨ COMBO!"
+            "🔥 MEGA!"
+        );
+
+    }else if(
+        total >= 2
+    ){
+
+        showMessage(
+            "✨ COMBO!"
         );
 
     }else{
 
-        showMessage("💥 TEMİZ!");
+        showMessage(
+            "💥 TEMİZ!"
+        );
     }
 
+
     /*
-      Temizleme sesi.
+       Ses
     */
 
-    [440,550,660,880].forEach(
-        (frequency,i) => {
+    const notes = [
 
-            if(i>=total+1) return;
+        440,
+        550,
+        660,
+        880
+    ];
 
-            setTimeout(
-                () => beep(
-                    frequency,
+
+    for(
+        let i=0;
+        i<Math.min(
+            total+1,
+            4
+        );
+        i++
+    ){
+
+        setTimeout(
+            () => {
+
+                sound(
+                    notes[i],
                     .12,
                     "sine",
                     .045
-                ),
-                i*55
-            );
-        }
-    );
+                );
 
-    drawBoard();
+            },
+            i*55
+        );
+    }
+
+
+    renderBoard();
+
     updateScore();
+
+
+    setTimeout(
+        checkGameOver,
+        120
+    );
 }
 
 
-/* =========================================================
+/* =====================================================
    PARÇACIKLAR
-   ========================================================= */
+===================================================== */
 
-function createParticles(r,c,color){
-
-    const boardElement =
-        document.getElementById("board");
+function createParticles(
+    r,
+    c,
+    color
+){
 
     const rect =
-        boardElement.getBoundingClientRect();
+        boardElement
+            .getBoundingClientRect();
 
-    const w=rect.width/SIZE;
-    const h=rect.height/SIZE;
 
-    const x=
-        rect.left+
-        c*w+
-        w/2;
+    const width =
+        rect.width /
+        SIZE;
 
-    const y=
-        rect.top+
-        r*h+
-        h/2;
 
-    for(let i=0;i<5;i++){
+    const height =
+        rect.height /
+        SIZE;
 
-        const particle=
-            document.createElement("div");
 
-        particle.className="particle";
+    const x =
+        rect.left +
+        c*width +
+        width/2;
 
-        particle.style.background=color;
 
-        particle.style.left=x+"px";
-        particle.style.top=y+"px";
+    const y =
+        rect.top +
+        r*height +
+        height/2;
 
-        particle.style.setProperty(
+
+    for(
+        let i=0;
+        i<6;
+        i++
+    ){
+
+        const p =
+            document.createElement(
+                "div"
+            );
+
+
+        p.className =
+            "particle";
+
+
+        p.style.background =
+            color;
+
+
+        p.style.left =
+            x+"px";
+
+
+        p.style.top =
+            y+"px";
+
+
+        p.style.setProperty(
             "--x",
-            ((Math.random()-.5)*150)+"px"
+            (
+                (Math.random()-.5)
+                *150
+            )+"px"
         );
 
-        particle.style.setProperty(
+
+        p.style.setProperty(
             "--y",
-            ((Math.random()-.5)*150)+"px"
+            (
+                (Math.random()-.5)
+                *150
+            )+"px"
         );
 
-        document
-            .getElementById("particles")
-            .appendChild(particle);
+
+        particlesElement.appendChild(
+            p
+        );
+
 
         setTimeout(
-            () => particle.remove(),
+            () => {
+
+                p.remove();
+
+            },
             800
         );
     }
 }
 
 
-/* =========================================================
+/* =====================================================
    MESAJ
-   ========================================================= */
+===================================================== */
 
-function showMessage(text){
+function showMessage(
+    text
+){
 
-    const element=
-        document.getElementById("message");
+    messageElement.textContent =
+        text;
 
-    element.textContent=text;
 
-    element.classList.remove("show");
+    messageElement.classList.remove(
+        "show"
+    );
 
-    void element.offsetWidth;
 
-    element.classList.add("show");
+    void messageElement.offsetWidth;
+
+
+    messageElement.classList.add(
+        "show"
+    );
 }
 
 
-/* =========================================================
-   GAME OVER
-   ========================================================= */
+/* =====================================================
+   GAME OVER KONTROLÜ
+===================================================== */
 
 function checkGameOver(){
 
-    if(paused || ended){
+    if(
+        gameOver ||
+        paused
+    ){
+
         return;
     }
 
-    const available=
-        pieces.filter(Boolean);
 
-    if(available.length===0){
+    const available =
+        pieces.filter(
+            piece =>
+                piece !== null
+        );
+
+
+    if(
+        available.length === 0
+    ){
+
         return;
     }
 
-    for(const piece of available){
 
-        for(let r=0;r<SIZE;r++){
+    /*
+       Döndürülmüş her hali kontrol edilir.
+    */
 
-            for(let c=0;c<SIZE;c++){
+    for(
+        const piece of available
+    ){
 
-                if(
-                    canPlace(
-                        piece.shape,
-                        r,
-                        c
-                    )
+        let testShape =
+            piece.shape;
+
+
+        for(
+            let rotation=0;
+            rotation<4;
+            rotation++
+        ){
+
+            for(
+                let r=0;
+                r<SIZE;
+                r++
+            ){
+
+                for(
+                    let c=0;
+                    c<SIZE;
+                    c++
                 ){
-                    return;
+
+                    if(
+                        canPlace(
+                            testShape,
+                            r,
+                            c
+                        )
+                    ){
+
+                        return;
+                    }
                 }
             }
+
+
+            testShape =
+                rotateShape(
+                    testShape,
+                    1
+                );
         }
     }
+
 
     endGame();
 }
 
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
 function endGame(){
 
-    ended=true;
+    if(gameOver){
 
-    beep(
-        300,
-        .15,
-        "sawtooth",
-        .03
+        return;
+    }
+
+
+    gameOver = true;
+
+
+    /*
+       Son skoru geçmişe kaydet.
+    */
+
+    addScoreToHistory(
+        score
     );
 
-    setTimeout(
-        () => beep(
-            220,
-            .25,
-            "sawtooth",
-            .03
-        ),
-        150
-    );
 
-    let newRecord=false;
+    renderScoreHistory();
 
-    if(score>best){
 
-        best=score;
+    /*
+       Rekor
+    */
+
+    let newRecord = false;
+
+
+    if(
+        score > best
+    ){
+
+        best = score;
+
 
         localStorage.setItem(
             "blockBlastBest",
             best
         );
 
-        newRecord=true;
+
+        newRecord = true;
     }
+
+
+    /*
+       Oyun bitti sesi
+    */
+
+    sound(
+        300,
+        .15,
+        "sawtooth",
+        .03
+    );
+
+
+    setTimeout(
+        () => {
+
+            sound(
+                220,
+                .25,
+                "sawtooth",
+                .03
+            );
+
+        },
+        150
+    );
+
+
+    /*
+       Oyun bitti titreşimi
+    */
+
+    vibrate([
+        100,
+        50,
+        150
+    ]);
+
+
+    /*
+       Skor
+    */
 
     document.getElementById(
         "finalScore"
-    ).textContent=
-        score.toLocaleString("tr-TR");
+    ).textContent =
+        score.toLocaleString(
+            "tr-TR"
+        );
+
 
     document.getElementById(
         "recordText"
-    ).textContent=
+    ).textContent =
         newRecord
             ? "🏆 YENİ REKOR!"
             : "Rekor: "+best;
 
+
     document
-        .getElementById("gameOver")
-        .classList.add("show");
+        .getElementById(
+            "gameOver"
+        )
+        .classList.add(
+            "show"
+        );
+
 
     updateScore();
 }
 
 
-/* =========================================================
-   SKOR
-   ========================================================= */
+/* =====================================================
+   SKOR GÜNCELLE
+===================================================== */
 
 function updateScore(){
 
-    document.getElementById(
-        "score"
-    ).textContent=
-        score.toLocaleString("tr-TR");
+    scoreElement.textContent =
+        score.toLocaleString(
+            "tr-TR"
+        );
 
-    document.getElementById(
-        "best"
-    ).textContent=
-        best.toLocaleString("tr-TR");
+
+    bestElement.textContent =
+        best.toLocaleString(
+            "tr-TR"
+        );
+
+
+    if(
+        combo >= 2
+    ){
+
+        comboElement.textContent =
+            "x"+combo;
+
+
+        comboBox.classList.add(
+            "active"
+        );
+
+    }else{
+
+        comboElement.textContent =
+            "x1";
+    }
 }
 
 
-/* =========================================================
-   BUTONLAR
-   ========================================================= */
+/* =====================================================
+   DÖNDÜRME BUTONLARI
+===================================================== */
 
-document.getElementById("sound").onclick=()=>{
+document
+    .getElementById(
+        "rotateLeftBtn"
+    )
+    .onclick = () => {
 
-    soundOn=!soundOn;
+        if(drag){
 
-    document.getElementById("sound").textContent=
-        soundOn
-            ? "🔊 SES"
-            : "🔇 SES KAPALI";
+            rotateDraggedPiece(
+                -1
+            );
 
-    if(soundOn){
+        }else{
+
+            showMessage(
+                "Parçayı sürükle!"
+            );
+        }
+    };
+
+
+document
+    .getElementById(
+        "rotateRightBtn"
+    )
+    .onclick = () => {
+
+        if(drag){
+
+            rotateDraggedPiece(
+                1
+            );
+
+        }else{
+
+            showMessage(
+                "Parçayı sürükle!"
+            );
+        }
+    };
+
+
+/* =====================================================
+   SES BUTONU
+===================================================== */
+
+document
+    .getElementById(
+        "soundBtn"
+    )
+    .onclick = () => {
+
+        soundEnabled =
+            !soundEnabled;
+
+
+        document.getElementById(
+            "soundBtn"
+        ).textContent =
+            soundEnabled
+                ? "🔊 SES"
+                : "🔇 KAPALI";
+
+
+        if(
+            soundEnabled
+        ){
+
+            startAudio();
+
+
+            sound(
+                600,
+                .08
+            );
+        }
+    };
+
+
+/* =====================================================
+   DURAKLAT
+===================================================== */
+
+document
+    .getElementById(
+        "pauseBtn"
+    )
+    .onclick = () => {
+
+        if(gameOver){
+
+            return;
+        }
+
+
+        paused =
+            !paused;
+
+
+        if(paused){
+
+            cancelDrag();
+        }
+
+
+        document.getElementById(
+            "pauseBtn"
+        ).textContent =
+            paused
+                ? "▶ DEVAM"
+                : "⏸ DURAKLAT";
+
+
+        showMessage(
+            paused
+                ? "⏸ DURDU"
+                : "▶ DEVAM!"
+        );
+    };
+
+
+/* =====================================================
+   YENİ OYUN
+===================================================== */
+
+document
+    .getElementById(
+        "restartBtn"
+    )
+    .onclick = () => {
 
         startAudio();
 
-        beep(
-            600,
-            .08
-        );
-    }
-};
+        startGame();
+    };
 
 
-document.getElementById("pause").onclick=()=>{
+/* =====================================================
+   TEKRAR OYNA
+===================================================== */
 
-    if(ended){
-        return;
-    }
+document
+    .getElementById(
+        "againBtn"
+    )
+    .onclick = () => {
 
-    paused=!paused;
+        startAudio();
 
-    document.getElementById("pause").textContent=
-        paused
-            ? "▶ DEVAM"
-            : "⏸ DURAKLAT";
-
-    showMessage(
-        paused
-            ? "⏸ DURAKLADI"
-            : "▶ DEVAM!"
-    );
-};
+        startGame();
+    };
 
 
-document.getElementById("restart").onclick=()=>{
-
-    startAudio();
-
-    newGame();
-};
-
-
-document.getElementById("again").onclick=()=>{
-
-    startAudio();
-
-    newGame();
-};
-
-
-/* =========================================================
+/* =====================================================
    KLAVYE
-   ========================================================= */
+===================================================== */
 
 document.addEventListener(
     "keydown",
     event => {
 
-        if(event.code==="Space"){
+        /*
+           SPACE
+        */
+
+        if(
+            event.code ===
+            "Space"
+        ){
 
             event.preventDefault();
 
+
             document
-                .getElementById("pause")
+                .getElementById(
+                    "pauseBtn"
+                )
                 .click();
+
+
+            return;
         }
 
-        if(
-            event.key.toLowerCase()==="r"
-        ){
-            newGame();
-        }
+
+        /*
+           R = YENİ
+        */
 
         if(
-            event.key.toLowerCase()==="m"
+            event.key.toLowerCase()
+            === "r" &&
+            !drag
         ){
+
+            startGame();
+
+            return;
+        }
+
+
+        /*
+           M = SES
+        */
+
+        if(
+            event.key.toLowerCase()
+            === "m"
+        ){
+
             document
-                .getElementById("sound")
+                .getElementById(
+                    "soundBtn"
+                )
                 .click();
+
+
+            return;
+        }
+
+
+        /*
+           Q / SOL OK
+           SOLA DÖNDÜR
+        */
+
+        if(
+            drag &&
+            (
+                event.key ===
+                    "ArrowLeft" ||
+
+                event.key.toLowerCase()
+                    === "q"
+            )
+        ){
+
+            event.preventDefault();
+
+
+            rotateDraggedPiece(
+                -1
+            );
+
+
+            return;
+        }
+
+
+        /*
+           E / SAĞ OK
+           SAĞA DÖNDÜR
+        */
+
+        if(
+            drag &&
+            (
+                event.key ===
+                    "ArrowRight" ||
+
+                event.key.toLowerCase()
+                    === "e"
+            )
+        ){
+
+            event.preventDefault();
+
+
+            rotateDraggedPiece(
+                1
+            );
+
+
+            return;
         }
     }
 );
 
 
-/* =========================================================
-   MOBİL
-   ========================================================= */
+/* =====================================================
+   TELEFONDA KAYMAYI ENGELLE
+===================================================== */
 
 document.addEventListener(
     "touchmove",
     event => {
 
-        if(dragging){
+        if(drag){
+
             event.preventDefault();
         }
+
     },
-    {passive:false}
+    {
+        passive:false
+    }
 );
+
+
+/* =====================================================
+   PENCERE ODAĞI KAYBOLURSA
+===================================================== */
+
+window.addEventListener(
+    "blur",
+    () => {
+
+        if(drag){
+
+            cancelDrag();
+        }
+    }
+);
+
+
+/* =====================================================
+   BAŞLANGIÇ
+===================================================== */
+
+applyTheme(
+    currentTheme
+);
+
+updateVibrationButton();
+
+renderScoreHistory();
+
+startGame();
 
 </script>
 
